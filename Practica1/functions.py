@@ -20,7 +20,7 @@ def get_mask_vector(sigma):
     limit_3sigma = fx(3 * sigma, sigma)
     # Obtenemos un array de valores discretos
     # para realizar la gaussiana
-    aux = np.arange(-3 * sigma, 3 * sigma + 1)
+    aux = np.arange(math.floor(-3 * sigma), math.ceil(3 * sigma )+ 1)
     # Rellenamos la máscara aplicando la exponencial
     mask = np.array([fx(i, sigma) for i in aux])
     # Despreciamos los valores menores a 3 sigma
@@ -38,7 +38,7 @@ def convolution(mask, img_array):
 def insert_img_into_other(img_src, pixel_left_top_row, pixel_left_top_col, img_dest):
     alt, anch = img_src.shape[:2]
     img_dest[pixel_left_top_row:alt+pixel_left_top_row,
-             pixel_left_top_col:anch+pixel_left_top_col] = img_src
+             pixel_left_top_col:anch+pixel_left_top_col] += img_src
 
 # Border replicate => coge el último píxel y lo replica
 # n_pixels veces
@@ -165,7 +165,6 @@ def convolution_grey_scale_img(mask, img, n_pixels):
 
     aux_2 = copy(aux)
 
-    cv2.imshow('image', aux)
     cv2.waitKey(0)
 
     for j in range(n_pixels, anch_ext - n_pixels):
@@ -240,10 +239,17 @@ def my_im_gauss_convolution(im, mask_convolution,
 
 
 def make_hybrid_image(img_lowF, img_highF,
-                      smoothing_mask):
+                      smoothing_mask, sharpering_mask):
 
     low_frecuencies = my_im_gauss_convolution(img_lowF, smoothing_mask, 0)
-    low_HF_aux = my_im_gauss_convolution(img_highF, smoothing_mask, 0)
+    cv2.imshow('low_frecuencies', low_frecuencies)
+    cv2.waitKey(0)
+    low_HF_aux = my_im_gauss_convolution(img_highF, sharpering_mask, 0)
+    cv2.imshow('low_frecuencies', low_HF_aux)
+    cv2.waitKey(0)
     sharper = img_highF - low_HF_aux
-    return insert_img_into_other(img_src=low_frecuencies, img_dest=sharper, pixel_left_top_row=0, pixel_left_top_col=0)
+    cv2.imshow('low_frecuencies', sharper)
+    cv2.waitKey(0)
+    insert_img_into_other(img_src=sharper, img_dest=low_frecuencies, pixel_left_top_row=0, pixel_left_top_col=0)
+    return low_frecuencies
 
