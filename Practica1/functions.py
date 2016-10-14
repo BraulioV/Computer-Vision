@@ -35,10 +35,14 @@ def convolution(mask, img_array):
     return np.sum(img_array * mask)
 
 
-def insert_img_into_other(img_src, pixel_left_top_row, pixel_left_top_col, img_dest):
+def insert_img_into_other(img_src, pixel_left_top_row, pixel_left_top_col, img_dest,substitute=False):
     alt, anch = img_src.shape[:2]
-    img_dest[pixel_left_top_row:alt+pixel_left_top_row,
-             pixel_left_top_col:anch+pixel_left_top_col] += img_src
+    if not substitute:
+        img_dest[pixel_left_top_row:alt+pixel_left_top_row,
+                 pixel_left_top_col:anch+pixel_left_top_col] += img_src
+    else:
+        img_dest[pixel_left_top_row:alt + pixel_left_top_row,
+                 pixel_left_top_col:anch + pixel_left_top_col] = img_src
 
 # Border replicate => coge el último píxel y lo replica
 # n_pixels veces
@@ -247,6 +251,7 @@ def make_hybrid_image(img_lowF, img_highF,
     low_HF_aux = my_im_gauss_convolution(img_highF, sharpering_mask, 0)
     # Restamos la imagen original menos sus frecuencias bajas para obtener las frecuencias altas
     sharper = img_highF - low_HF_aux
+    print(sharper[sharper<0])
     # y superponemos las imágenes
     insert_img_into_other(img_src=sharper, img_dest=low_frecuencies,
                           pixel_left_top_row=0, pixel_left_top_col=0)
@@ -255,14 +260,76 @@ def make_hybrid_image(img_lowF, img_highF,
         pass
     return low_frecuencies
 
+
 def subsample_image(img_src, subsample_factor = 2):
     alt, anch = img_src.shape[:2]
-
+    # Obtenemos una máscara de suavizado
     smoothing_mask = get_mask_vector(1)
-
+    # Suavizamos la máscara
     smoothed_img = my_im_gauss_convolution(im=img_src,mask_convolution=smoothing_mask)
-
+    # Eliminamos las filas que queramos
     aux = smoothed_img[range(0,alt, subsample_factor)]
-
+    # Y devolvemos de la matriz anterior, todas las filas
+    # y las columnas que queramos
     return aux[:, range(0,anch, subsample_factor)]
+
+def max_images_on_pyramidal_canvas(img_src, canvas_rows, subsample_factor):
+
+    floor = math.floor
+    # Obtenemos el número de píxeles disponibles en filas para
+    # poder crear la imagen
+    rows_available = canvas_rows
+    # Obtenemos la altura de la imagen para operar con ella
+    # y obtener el máximo de imágenes que pueden entrar en el canvas
+    height = canvas_rows
+    # Anotamos la altura a la que se encuentra el último
+    # píxel de la imagen añadido
+    n_imgs = 0
+    # Al final de la imagen, se deja un margen prudencial
+    # de 10 píxeles
+    while rows_available >= height and height > 10:
+
+        height = floor(height/subsample_factor)
+
+        rows_available -= height
+
+        n_imgs += 1
+
+    return n_imgs
+
+
+def generate_new_pyramidal_canvas(img_src, times_to_show, subsample_factor = 2):
+
+    alt, anch = img_src.shape[:2]
+    # Generamos un canvas vacío
+    canvas = np.zeros((alt,anch+math.floor(anch/2)),dtype=np.uint8)+255
+    # insertamos la imagen original a la izquierda del canvas
+    insert_img_into_other(img_src=img_src, img_dest=canvas,
+                          pixel_left_top_row=0, pixel_left_top_col=0,
+                          substitute=True)
+    # fila en la que se insertará la siguiente imagen
+    # a la que se le aplicará el subsampling
+    row = 0
+    # imagen copia de la original con la que se trabajará
+    im = np.copy(img_src)
+    # máximo número de imágenes que se pueden incrustar en pirámide
+    max = max_images_on_pyramidal_canvas(img_src, canvas.shape[1], subsample_factor)
+    if times_to_show > max:
+        times_to_show = max
+
+    for i in range(0, times_to_show-1):
+        # Realizamos el subsample
+        im = subsample_image(img_src=im,
+                             subsample_factor=subsample_factor)
+        # insertamos la imagen en el canvas
+        insert_img_into_other(img_src=im, img_dest=canvas,
+                              pixel_left_top_row=row, pixel_left_top_col=anch,
+                              substitute=True)
+        # y anotamos en qué fila insertar la siguiente imagen
+        row += im.shape[0]
+
+    return canvas
+
+
+
 
