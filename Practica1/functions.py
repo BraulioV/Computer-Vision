@@ -239,17 +239,30 @@ def my_im_gauss_convolution(im, mask_convolution,
 
 
 def make_hybrid_image(img_lowF, img_highF,
-                      smoothing_mask, sharpering_mask):
-
+                      smoothing_mask, sharpering_mask,
+                      show_images = False):
+    # Suavizamos la imagen que usaremos de base
     low_frecuencies = my_im_gauss_convolution(img_lowF, smoothing_mask, 0)
-    cv2.imshow('low_frecuencies', low_frecuencies)
-    cv2.waitKey(0)
+    # Obtenemos las frecuencias bajas de la imagen que superpondremos a la base
     low_HF_aux = my_im_gauss_convolution(img_highF, sharpering_mask, 0)
-    cv2.imshow('low_frecuencies', low_HF_aux)
-    cv2.waitKey(0)
+    # Restamos la imagen original menos sus frecuencias bajas para obtener las frecuencias altas
     sharper = img_highF - low_HF_aux
-    cv2.imshow('low_frecuencies', sharper)
-    cv2.waitKey(0)
-    insert_img_into_other(img_src=sharper, img_dest=low_frecuencies, pixel_left_top_row=0, pixel_left_top_col=0)
+    # y superponemos las imágenes
+    insert_img_into_other(img_src=sharper, img_dest=low_frecuencies,
+                          pixel_left_top_row=0, pixel_left_top_col=0)
+
+    if show_images:
+        pass
     return low_frecuencies
+
+def subsample_image(img_src, subsample_factor = 2):
+    alt, anch = img_src.shape[:2]
+
+    smoothing_mask = get_mask_vector(1)
+
+    smoothed_img = my_im_gauss_convolution(im=img_src,mask_convolution=smoothing_mask)
+
+    aux = smoothed_img[range(0,alt, subsample_factor)]
+
+    return aux[:, range(0,anch, subsample_factor)]
 
