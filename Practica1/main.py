@@ -13,8 +13,8 @@ if __name__ == "__main__":
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
 
-    img01 = cv2.imread('data/dog.bmp', flags=cv2.IMREAD_GRAYSCALE)
-    img02 = cv2.imread('data/cat.bmp', flags=cv2.IMREAD_GRAYSCALE)
+    img01 = cv2.imread('data/fish.bmp', flags=cv2.IMREAD_COLOR)
+    img02 = cv2.imread('data/submarine.bmp', flags=cv2.IMREAD_COLOR)
 
     mask_img01 = functions.get_mask_vector(8)
     mask_img02 = functions.get_mask_vector(3)

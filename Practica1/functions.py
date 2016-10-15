@@ -35,7 +35,9 @@ def convolution(mask, img_array):
     return np.sum(img_array * mask)
 
 
-def insert_img_into_other(img_src, pixel_left_top_row, pixel_left_top_col, img_dest,substitute=False):
+def insert_img_into_other(img_src, pixel_left_top_row,
+                          pixel_left_top_col,
+                          img_dest,substitute=False):
     alt, anch = img_src.shape[:2]
     if not substitute:
         img_dest[pixel_left_top_row:alt+pixel_left_top_row,
@@ -125,25 +127,26 @@ def extend(img_src, n_pixels, border_type, k):
     insert_img_into_other(img_src=img_src, pixel_left_top_row=n_pixels,
                           pixel_left_top_col=n_pixels, img_dest=new_extended_img)
 
-    if border_type == 0:
+    if border_type == 0:    # Border Replicate
         border_replicate(new_extended_img, n_pixels, alt, anch)
-    elif border_type == 1:
+    elif border_type == 1:  # Border Reflect
         border_reflect(new_extended_img, n_pixels, alt, anch)
-    elif border_type == 2:
+    elif border_type == 2:  # Border Reflect 101
         border_reflect_101(new_extended_img, n_pixels, alt, anch)
-    elif border_type == 3:
+    elif border_type == 3:  # Border wrap
         border_wrap(new_extended_img, n_pixels, alt, anch)
-    elif border_type == 4:
+    elif border_type == 4:  # Border Constant
         border_constant(new_extended_img, n_pixels, alt, anch, k)
 
     return new_extended_img
 
 
-def extend_image_n_pixels(img_src, n_pixels, border_type, k=255):
+def extend_image_n_pixels(img_src, n_pixels, border_type, k=0):
 
-    if len(img_src.shape) != 3:
+    if len(img_src.shape) != 3: # Imagen en escala de grises
         return extend(img_src, n_pixels, border_type, k)
-    else:
+
+    else:   # Imagen en color
         b_channel, g_channel, r_channel = cv2.split(img_src)
 
         b_channel_ext = extend(b_channel, n_pixels, border_type, k)
