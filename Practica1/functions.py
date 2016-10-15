@@ -302,7 +302,7 @@ def generate_new_pyramidal_canvas(img_src, times_to_show, subsample_factor = 2):
 
     alt, anch = img_src.shape[:2]
     # Generamos un canvas vacío
-    canvas = np.zeros((alt,anch+math.floor(anch/2)),dtype=np.uint8)+255
+    canvas = np.zeros((alt,anch+math.ceil(anch/subsample_factor)),dtype=np.uint8)+255
     # insertamos la imagen original a la izquierda del canvas
     insert_img_into_other(img_src=img_src, img_dest=canvas,
                           pixel_left_top_row=0, pixel_left_top_col=0,
