@@ -172,8 +172,6 @@ def convolution_grey_scale_img(mask, img, n_pixels):
 
     aux_2 = copy(aux)
 
-    cv2.waitKey(0)
-
     for j in range(n_pixels, anch_ext - n_pixels):
         for i in range(n_pixels, alt_ext - n_pixels):
             aux_2[i, j] = cv(mask, aux[i - n_pixels:1 + i + n_pixels, j])
