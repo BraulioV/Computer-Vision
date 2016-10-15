@@ -23,7 +23,9 @@ if __name__ == "__main__":
     cv2.imshow('hibrida', hybrid)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    canvas = functions.generate_new_pyramidal_canvas(hybrid, times_to_show= 8)
-    cv2.imshow('canvas', canvas)
+    txt = ["Imagen 1", "Imagen 2", "Imagen 3"]
+    # canvas = functions.generate_new_pyramidal_canvas(hybrid, times_to_show= 8)
+    cv2.imshow('canvas_largo', functions.generate_continous_canvas([img01,img02,hybrid],txt))
+    # cv2.imshow('canvas', canvas)
     cv2.waitKey(0)
     cv2.destroyAllWindows()

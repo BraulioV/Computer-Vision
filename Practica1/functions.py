@@ -251,7 +251,6 @@ def make_hybrid_image(img_lowF, img_highF,
     low_HF_aux = my_im_gauss_convolution(img_highF, sharpering_mask, 0)
     # Restamos la imagen original menos sus frecuencias bajas para obtener las frecuencias altas
     sharper = img_highF - low_HF_aux
-    print(sharper[sharper<0])
     # y superponemos las imágenes
     insert_img_into_other(img_src=sharper, img_dest=low_frecuencies,
                           pixel_left_top_row=0, pixel_left_top_col=0)
@@ -330,6 +329,24 @@ def generate_new_pyramidal_canvas(img_src, times_to_show, subsample_factor = 2):
 
     return canvas
 
+def generate_continous_canvas(list_imgs, text):
+    length, height = 0, 0
+
+    max_of = max
+    # Obtenemos la anchura máxima del canvas
+    # y la altura máxima que debe tener para que
+    # pueda a
+    for i in list_imgs:
+        alt, anch = i.shape[:2]
+        length+=anch
+        height = max_of(height, alt)
+
+    canvas = np.ones((height, length), dtype=np.uint8)*255
+
+    length = 0
+    for i in list_imgs:
+        insert_img_into_other(i, 0, length, canvas, substitute=True)
+        length+=i.shape[1]
 
 
-
+    return canvas
