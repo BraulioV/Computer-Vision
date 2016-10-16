@@ -257,7 +257,7 @@ def make_hybrid_image(img_lowF, img_highF,
                           pixel_left_top_row=0, pixel_left_top_col=0)
 
     if show_images:
-        pass
+        generate_continous_canvas([low_frecuencies, sharper])
     return low_frecuencies
 
 
@@ -272,6 +272,7 @@ def subsample_image(img_src, subsample_factor = 2):
     # Y devolvemos de la matriz anterior, todas las filas
     # y las columnas que queramos
     return aux[:, range(0,anch, subsample_factor)]
+
 
 def max_images_on_pyramidal_canvas(img_src, canvas_rows, subsample_factor):
 
@@ -330,19 +331,27 @@ def generate_new_pyramidal_canvas(img_src, times_to_show, subsample_factor = 2):
 
     return canvas
 
-def generate_continous_canvas(list_imgs, text):
+
+def generate_continous_canvas(list_imgs):
     length, height = 0, 0
 
     max_of = max
     # Obtenemos la anchura máxima del canvas
     # y la altura máxima que debe tener para que
     # pueda a
+    color_imgs = False
     for i in list_imgs:
         alt, anch = i.shape[:2]
-        length+=anch
+        length += anch
         height = max_of(height, alt)
 
-    canvas = np.ones((height, length), dtype=np.uint8)*255
+        if len(i.shape) == 3:
+            color_imgs = True
+
+    if not color_imgs:
+        canvas = np.ones((height, length), dtype=np.uint8)*255
+    else:
+        canvas = np.ones((height, length, 3), dtype=np.uint8) * 255
 
     length = 0
     for i in list_imgs:
