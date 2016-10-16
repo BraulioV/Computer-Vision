@@ -244,10 +244,14 @@ def my_im_gauss_convolution(im, mask_convolution,
 
 
 def make_hybrid_image(img_lowF, img_highF,
-                      smoothing_mask, sharpering_mask,
+                      smoothing_mask_sigma,
+                      sharpering_mask_sigma,
                       show_images = False):
+    smoothing_mask = get_mask_vector(smoothing_mask_sigma)
+    sharpering_mask = get_mask_vector(sharpering_mask_sigma)
     # Suavizamos la imagen que usaremos de base
     low_frecuencies = my_im_gauss_convolution(img_lowF, smoothing_mask, 0)
+    low_frecuencies_img1 = np.copy(low_frecuencies)
     # Obtenemos las frecuencias bajas de la imagen que superpondremos a la base
     low_HF_aux = my_im_gauss_convolution(img_highF, sharpering_mask, 0)
     # Restamos la imagen original menos sus frecuencias bajas para obtener las frecuencias altas
@@ -257,7 +261,10 @@ def make_hybrid_image(img_lowF, img_highF,
                           pixel_left_top_row=0, pixel_left_top_col=0)
 
     if show_images:
-        generate_continous_canvas([low_frecuencies, sharper])
+        cv2.imshow('Bajas frecuencias, altas frecuencias, imagen hibrida',
+                   generate_continous_canvas([low_frecuencies_img1, sharper, low_frecuencies]))
+        cv2.waitKey(0)
+
     return low_frecuencies
 
 

@@ -16,16 +16,13 @@ if __name__ == "__main__":
     img01 = cv2.imread('data/fish.bmp', flags=cv2.IMREAD_COLOR)
     img02 = cv2.imread('data/submarine.bmp', flags=cv2.IMREAD_COLOR)
 
-    mask_img01 = functions.get_mask_vector(8)
-    mask_img02 = functions.get_mask_vector(3)
     hybrid = functions.make_hybrid_image(
-        img01,img02,mask_img01, mask_img02)
+        img01,img02, 8, 3,True)
     cv2.imshow('hibrida', hybrid)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    txt = ["Imagen 1", "Imagen 2", "Imagen 3"]
     # canvas = functions.generate_new_pyramidal_canvas(hybrid, times_to_show= 8)
-    cv2.imshow('canvas_largo', functions.generate_continous_canvas([img01,img02,hybrid],txt))
+    # cv2.imshow('canvas_largo', functions.generate_continous_canvas([img01,img02,hybrid]))
     # cv2.imshow('canvas', canvas)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
