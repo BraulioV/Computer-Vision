@@ -402,3 +402,4 @@ def generate_continous_canvas(list_imgs):
 def show_img(im, name):
     cv2.imshow(name, im.astype(np.uint8))
     cv2.waitKey(0)
+    cv2.destroyAllWindows()
