@@ -46,6 +46,7 @@ def insert_img_into_other(img_src, pixel_left_top_row,
         img_dest[pixel_left_top_row:alt + pixel_left_top_row,
                  pixel_left_top_col:anch + pixel_left_top_col] = img_src
 
+
 # Border replicate => coge el último píxel y lo replica
 # n_pixels veces
 def border_replicate(img, n_pixels, alt, anch):
@@ -247,10 +248,14 @@ def make_hybrid_image(img_lowF, img_highF,
                       smoothing_mask_sigma,
                       sharpering_mask_sigma,
                       show_images = False):
+    # Obtenemos las máscaras gaussianas para trabajar
+    # con las imágenes
     smoothing_mask = get_mask_vector(smoothing_mask_sigma)
     sharpering_mask = get_mask_vector(sharpering_mask_sigma)
     # Suavizamos la imagen que usaremos de base
     low_frecuencies = my_im_gauss_convolution(img_lowF, smoothing_mask, 0)
+    # Guardamos una copia de la imagen para mostrarla más
+    # adelante por pantalla
     low_frecuencies_img1 = np.copy(low_frecuencies)
     # Obtenemos las frecuencias bajas de la imagen que superpondremos a la base
     low_HF_aux = my_im_gauss_convolution(img_highF, sharpering_mask, 0)
@@ -275,7 +280,13 @@ def subsample_image(img_src, subsample_factor = 2):
     # Suavizamos la máscara
     smoothed_img = my_im_gauss_convolution(im=img_src,mask_convolution=smoothing_mask)
     # Eliminamos las filas que queramos
-    aux = smoothed_img[range(0,alt, subsample_factor)]
+
+    if len(img_src.shape) != 3:
+        aux = smoothed_img[range(0, alt, subsample_factor)]
+    else:
+        # b_channel, g_channel, r_channel = cv2.split(aux)
+        aux = smoothed_img[range(0, alt, subsample_factor),:]
+
     # Y devolvemos de la matriz anterior, todas las filas
     # y las columnas que queramos
     return aux[:, range(0,anch, subsample_factor)]
@@ -290,15 +301,17 @@ def max_images_on_pyramidal_canvas(img_src, canvas_rows, subsample_factor):
     # Obtenemos la altura de la imagen para operar con ella
     # y obtener el máximo de imágenes que pueden entrar en el canvas
     height = canvas_rows
+    length = img_src.shape[1]
     # Anotamos la altura a la que se encuentra el último
     # píxel de la imagen añadido
     n_imgs = 0
     # Al final de la imagen, se deja un margen prudencial
     # de 10 píxeles
-    while rows_available >= height and height > 10:
+    while rows_available >= height and \
+            (height > 10 or length > 10):
 
         height = floor(height/subsample_factor)
-
+        length = floor(length/subsample_factor)
         rows_available -= height
 
         n_imgs += 1
@@ -309,8 +322,15 @@ def max_images_on_pyramidal_canvas(img_src, canvas_rows, subsample_factor):
 def generate_new_pyramidal_canvas(img_src, times_to_show, subsample_factor = 2):
 
     alt, anch = img_src.shape[:2]
-    # Generamos un canvas vacío
-    canvas = np.zeros((alt,anch+math.ceil(anch/subsample_factor)),dtype=np.uint8)+255
+    # Generamos un canvas vacío dependiendo de si la imagen es
+    # en color o en escala de grises
+    if len(img_src.shape) != 3:
+        canvas = np.zeros((alt, anch + math.ceil(anch / subsample_factor)),
+                          dtype=np.uint8) + 255
+    else:
+        canvas = np.zeros((alt, anch + math.ceil(anch / subsample_factor),3),
+                          dtype=np.uint8) + 255
+
     # insertamos la imagen original a la izquierda del canvas
     insert_img_into_other(img_src=img_src, img_dest=canvas,
                           pixel_left_top_row=0, pixel_left_top_col=0,
@@ -355,12 +375,15 @@ def generate_continous_canvas(list_imgs):
         if len(i.shape) == 3:
             color_imgs = True
 
+    # Diferenciamos entre imágenes en color o en escala
+    # de grises, para crear un canvas u otro
     if not color_imgs:
         canvas = np.ones((height, length), dtype=np.uint8)*255
     else:
         canvas = np.ones((height, length, 3), dtype=np.uint8) * 255
 
     length = 0
+    # Añadimos
     for i in list_imgs:
         insert_img_into_other(i, 0, length, canvas, substitute=True)
         length+=i.shape[1]
