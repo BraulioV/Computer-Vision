@@ -32,7 +32,9 @@ def get_mask_vector(sigma):
 
 
 def convolution(mask, img_array):
-    return np.sum(img_array * mask)
+    # Es lo mismo que realizar esto:
+    # np.convolve(img_array, mask, 'valid')
+    return np.sum(mask * img_array)
 
 
 def insert_img_into_other(img_src, pixel_left_top_row,
@@ -357,7 +359,9 @@ def generate_new_pyramidal_canvas(img_src, times_to_show, subsample_factor = 2):
 
     return canvas
 
-
+# Esta función genera un canvas en el que va insertando
+# de forma continua las imágenes que se encuentran en
+# la lista que le pasamos como parámetro
 def generate_continous_canvas(list_imgs):
     length, height = 0, 0
 
@@ -390,6 +394,11 @@ def generate_continous_canvas(list_imgs):
 
     return canvas
 
-def show_img(im,name):
+# Esta función muestra la imagen por pantalla, y asocia
+# a la ventana el nombre que entra por parámetro.
+# Esta imagen, es muy probable que tenga datos de tipo float64
+# por lo que se hace un "cast" a unsigned int 8, que son
+# valores que van de 0 a 255
+def show_img(im, name):
     cv2.imshow(name, im.astype(np.uint8))
     cv2.waitKey(0)
