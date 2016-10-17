@@ -107,15 +107,15 @@ def border_wrap(img, n_pixels, alt, anch):
     # píxeles con valor k
 def border_constant(img, n_pixels, alt, anch, k):
     # Borde superior
-    img[0:n_pixels, ] = np.ones((n_pixels, img.shape[1]), dtype=np.uint8) * k
+    img[0:n_pixels, ] = np.ones((n_pixels, img.shape[1]), dtype=np.float64) * k
     # Borde inferior
     img[n_pixels + alt:(alt + 2 * n_pixels), ] = \
-        np.ones((n_pixels, img.shape[1]), dtype=np.uint8) * k
+        np.ones((n_pixels, img.shape[1]), dtype=np.float64) * k
     # Borde izquierdo
-    img[:, 0:n_pixels] = np.ones((img.shape[0], n_pixels), dtype=np.uint8) * k
+    img[:, 0:n_pixels] = np.ones((img.shape[0], n_pixels), dtype=np.float64) * k
     # Borde derecho
     img[:, n_pixels + anch:img.shape[1]] = \
-        np.ones((img.shape[0], n_pixels), dtype=np.uint8) * k
+        np.ones((img.shape[0], n_pixels), dtype=np.float64) * k
 
 
 def extend(img_src, n_pixels, border_type, k):
@@ -123,7 +123,7 @@ def extend(img_src, n_pixels, border_type, k):
     alt, anch = img_src.shape[:2]
     # Generamos una nueva matriz expandida a partir del
     # alto y ancho de la anterior
-    new_extended_img = np.zeros((alt + 2 * n_pixels, anch + 2 * n_pixels), dtype=np.uint8)
+    new_extended_img = np.zeros((alt + 2 * n_pixels, anch + 2 * n_pixels), dtype=np.float64)
 
     insert_img_into_other(img_src=img_src, pixel_left_top_row=n_pixels,
                           pixel_left_top_col=n_pixels, img_dest=new_extended_img)
@@ -162,16 +162,16 @@ def convolution_grey_scale_img(mask, img, n_pixels):
     alt_ext, anch_ext = img.shape[:2]
 
     cv = convolution
-    copy = np.copy
+    copy = np.array
 
     # Obtenemos una matriz auxiliar
-    aux = copy(img)
+    aux = copy(img, copy=True,dtype=np.float64)
 
     for i in range(n_pixels, alt_ext - n_pixels):
         for j in range(n_pixels, anch_ext - n_pixels):
             aux[i, j] = cv(mask, img[i, j - n_pixels:1 + j + n_pixels])
 
-    aux_2 = copy(aux)
+    aux_2 = copy(aux, copy=True, dtype=np.float64)
 
     for j in range(n_pixels, anch_ext - n_pixels):
         for i in range(n_pixels, alt_ext - n_pixels):
@@ -193,9 +193,9 @@ def convolution_color_img(mask, img, n_pixels):
 
     # Obtenemos una matriz auxiliar por cada uno de
     # los canales de color de la imagen
-    aux_r = zeros((alt_ext, anch_ext), dtype=np.uint8)
-    aux_g = zeros((alt_ext, anch_ext), dtype=np.uint8)
-    aux_b = zeros((alt_ext, anch_ext), dtype=np.uint8)
+    aux_r = zeros((alt_ext, anch_ext), dtype=np.float64)
+    aux_g = zeros((alt_ext, anch_ext), dtype=np.float64)
+    aux_b = zeros((alt_ext, anch_ext), dtype=np.float64)
     # Empezamos
     for i in range(n_pixels, alt_ext - n_pixels):
         for j in range(n_pixels, anch_ext - n_pixels):
@@ -266,9 +266,8 @@ def make_hybrid_image(img_lowF, img_highF,
                           pixel_left_top_row=0, pixel_left_top_col=0)
 
     if show_images:
-        cv2.imshow('Bajas frecuencias, altas frecuencias, imagen hibrida',
-                   generate_continous_canvas([low_frecuencies_img1, sharper, low_frecuencies]))
-        cv2.waitKey(0)
+        show_img(generate_continous_canvas([low_frecuencies_img1, sharper, low_frecuencies]),
+                 'Bajas frecuencias, altas frecuencias, imagen hibrida')
 
     return low_frecuencies
 
@@ -326,10 +325,10 @@ def generate_new_pyramidal_canvas(img_src, times_to_show, subsample_factor = 2):
     # en color o en escala de grises
     if len(img_src.shape) != 3:
         canvas = np.zeros((alt, anch + math.ceil(anch / subsample_factor)),
-                          dtype=np.uint8) + 255
+                          dtype=np.float64) + 255
     else:
         canvas = np.zeros((alt, anch + math.ceil(anch / subsample_factor),3),
-                          dtype=np.uint8) + 255
+                          dtype=np.float64) + 255
 
     # insertamos la imagen original a la izquierda del canvas
     insert_img_into_other(img_src=img_src, img_dest=canvas,
@@ -378,9 +377,9 @@ def generate_continous_canvas(list_imgs):
     # Diferenciamos entre imágenes en color o en escala
     # de grises, para crear un canvas u otro
     if not color_imgs:
-        canvas = np.ones((height, length), dtype=np.uint8)*255
+        canvas = np.ones((height, length), dtype=np.float64)*255
     else:
-        canvas = np.ones((height, length, 3), dtype=np.uint8) * 255
+        canvas = np.ones((height, length, 3), dtype=np.float64) * 255
 
     length = 0
     # Añadimos
@@ -390,3 +389,7 @@ def generate_continous_canvas(list_imgs):
 
 
     return canvas
+
+def show_img(im,name):
+    cv2.imshow(name, im.astype(np.uint8))
+    cv2.waitKey(0)
