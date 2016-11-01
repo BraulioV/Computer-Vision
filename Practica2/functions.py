@@ -474,25 +474,30 @@ def show_img(im, name):
 def extract_harris_points(img, blockS, kSize):
 
     alt, anch = img.shape[:2]
+    print(img.shape)
+    print(img.dtype)
 
     if alt % 2 != 0 and anch % 2 == 0:
-        aux = np.zeros(shape=(alt+1, anch), dtype=np.float64)
+        aux = np.ones(shape=(alt+1, anch), dtype=np.uint8)
         insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
-                              pixel_left_top_row=0)
+                              pixel_left_top_row=0, substitute=True)
     elif alt % 2 == 0 and anch % 2 != 0:
-        aux = np.zeros(shape=(alt, anch+1), dtype=np.float64)
+        aux = np.ones(shape=(alt, anch+1), dtype=np.uint8)
         insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
-                              pixel_left_top_row=0)
+                              pixel_left_top_row=0, substitute=True)
 
     elif alt % 2 != 0 and anch % 2 != 0:
-        aux = np.zeros(shape=(alt+1, anch+1), dtype=np.float64)
+        aux = np.ones(shape=(alt+1, anch+1), dtype=np.uint8)
         insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
-                              pixel_left_top_row=0)
+                              pixel_left_top_row=0, substitute=True)
 
     else:
-        aux = img
+        aux = np.copy(img)
 
     pyramide = generate_gaussian_piramide(img_src=aux, subsample_factor=2, n_levels=3)
+    eingenValsAndVecs = []
 
     for im in pyramide:
-        cv2.cornerEigenValsAndVecs(src=im, blockSize=blockS, ksize=kSize)
+        aux2 = np.copy(im)
+        # show_img(im, 'a')
+        eingenValsAndVecs.append(cv2.cornerEigenValsAndVecs(src=im.astype(np.uint8), blockSize=blockS, ksize=kSize))
