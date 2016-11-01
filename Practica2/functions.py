@@ -466,3 +466,33 @@ def show_img(im, name):
     cv2.imshow(name, im.astype(np.uint8))
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
+def extract_harris_points(img, blockS, kSize):
+
+    alt, anch = img.shape[:2]
+
+    if alt % 2 != 0 and anch % 2 == 0:
+        aux = np.zeros(shape=(alt+1, anch), dtype=np.float64)
+        insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
+                              pixel_left_top_row=0)
+    elif alt % 2 == 0 and anch % 2 != 0:
+        aux = np.zeros(shape=(alt, anch+1), dtype=np.float64)
+        insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
+                              pixel_left_top_row=0)
+
+    elif alt % 2 != 0 and anch % 2 != 0:
+        aux = np.zeros(shape=(alt+1, anch+1), dtype=np.float64)
+        insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
+                              pixel_left_top_row=0)
+
+    else:
+        aux = img
+
+    pyramide = generate_gaussian_piramide(img_src=aux, subsample_factor=2, n_levels=3)
+
+    for im in pyramide:
+        cv2.cornerEigenValsAndVecs(src=im, blockSize=blockS, ksize=kSize)
