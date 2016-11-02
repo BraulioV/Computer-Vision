@@ -10,6 +10,8 @@ import numpy as np
 #      (-0.5*-----------)
 #   e^         sigma^2
 #
+from numpy.core.multiarray import einsum
+
 fx = lambda x, sigma: math.exp(-0.5 * (x ** 2 / sigma ** 2))
 
 
@@ -471,11 +473,30 @@ def show_img(im, name):
 ########################################################################################################################
 ########################################################################################################################
 
-def extract_harris_points(img, blockS, kSize):
+harrisCriterio = lambda det, tr, k=0.04: det - k*(tr**2)
 
+# Esta función comprueba si el centro del entorno es
+# un máximo local o no
+def local_maximun(environment):
+    floor = math.floor
+    # si el entorno es 2D, accedemos al centro dividiendo
+    # sus dimensiones entre dos y redondeando hacia abajo
+    # y comprobamos si es el máximo local o no
+    if len(environment.shape) == 2:
+        height, width = environment.shape[:2]
+        center = environment[floor(width/2),floor(height/2)]
+        return center == np.max(environment)
+    elif len(environment.shape) == 1:
+        return environment[floor(len(environment)/2)]==np.max(environment)
+
+
+def extract_harris_points(img, blockS, kSize, thresdhold):
+    # Extraemos las dimensiones de la imagen, para que,
+    # en caso de que sean de tamaño impar, añadirle una fila
+    # o columna según corresponda, para que, al reducir,
+    # podamos recuperar fácilmente las coordenadas de los puntos
+    # harris.
     alt, anch = img.shape[:2]
-    print(img.shape)
-    print(img.dtype)
 
     if alt % 2 != 0 and anch % 2 == 0:
         aux = np.ones(shape=(alt+1, anch), dtype=np.uint8)
@@ -495,9 +516,22 @@ def extract_harris_points(img, blockS, kSize):
         aux = np.copy(img)
 
     pyramide = generate_gaussian_piramide(img_src=aux, subsample_factor=2, n_levels=3)
+
     eingenValsAndVecs = []
 
     for im in pyramide:
-        eingenValsAndVecs.append(cv2.cornerEigenValsAndVecs(src=im.astype(np.uint8), blockSize=blockS, ksize=kSize))
+        result =cv2.split(cv2.cornerEigenValsAndVecs(src=im.astype(np.uint8), blockSize=blockS, ksize=kSize))
+        det = cv2.mulSpectrums(result[0], result[1], flags=cv2.DFT_ROWS)
+        trace = result[0] + result[1]
+        eingenValsAndVecs.append(harrisCriterio(det, trace))
+        # show_img(eingenValsAndVecs[-1],'a')
+
+
+
+
+
+
+    # supresión de no máximos de la imagen.
+
 
 
