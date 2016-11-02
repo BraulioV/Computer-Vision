@@ -498,6 +498,6 @@ def extract_harris_points(img, blockS, kSize):
     eingenValsAndVecs = []
 
     for im in pyramide:
-        aux2 = np.copy(im)
-        # show_img(im, 'a')
         eingenValsAndVecs.append(cv2.cornerEigenValsAndVecs(src=im.astype(np.uint8), blockSize=blockS, ksize=kSize))
+
+
