@@ -7,7 +7,7 @@
     <bookmark url="file://$PROJECT_DIR$/Practica1/functions.py" line="337" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="590ea915-2e7d-4349-ba73-7b2618a33e7a" name="Default" comment="">
+    <list default="true" id="590ea915-2e7d-4349-ba73-7b2618a33e7a" name="Default" comment="ya se obtiene la matriz harris">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Practica2/functions.py" afterPath="$PROJECT_DIR$/Practica2/functions.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Practica2/main.py" afterPath="$PROJECT_DIR$/Practica2/main.py" />
@@ -22,7 +22,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Computer-Vision$functions.coverage" NAME="functions Coverage Results" MODIFIED="1476455446989" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica1" />
-    <SUITE FILE_PATH="coverage/Computer-Vision$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1478089443150" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
+    <SUITE FILE_PATH="coverage/Computer-Vision$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1478115047428" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
     <SUITE FILE_PATH="coverage/Computer-Vision$main.coverage" NAME="main Coverage Results" MODIFIED="1477307715097" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica1" />
     <SUITE FILE_PATH="coverage/Computer-Vision$functions__1_.coverage" NAME="functions (1) Coverage Results" MODIFIED="1478087209825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
   </component>
@@ -38,8 +38,8 @@
       <file leaf-file-name="functions.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Practica2/functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-314">
-              <caret line="491" column="0" lean-forward="true" selection-start-line="491" selection-start-column="0" selection-end-line="491" selection-end-column="0" />
+            <state relative-caret-position="150">
+              <caret line="496" column="8" lean-forward="false" selection-start-line="496" selection-start-column="8" selection-end-line="496" selection-end-column="8" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -50,8 +50,8 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Practica2/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" column="115" lean-forward="false" selection-start-line="6" selection-start-column="115" selection-end-line="6" selection-end-column="115" />
+            <state relative-caret-position="105">
+              <caret line="7" column="50" lean-forward="false" selection-start-line="7" selection-start-column="50" selection-end-line="7" selection-end-column="50" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -117,7 +117,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="width" value="1366" />
+    <option name="x" value="687" />
+    <option name="width" value="679" />
     <option name="height" value="732" />
   </component>
   <component name="ProjectView">
@@ -588,11 +589,18 @@
       <option name="project" value="LOCAL" />
       <updated>1478083219056</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="ya se obtiene la matriz harris">
+      <created>1478103686813</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1478103686813</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1366" height="732" extended-state="6" />
+    <frame x="687" y="0" width="679" height="732" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.0" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -601,7 +609,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289256" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289256" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3289256" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289256" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -632,7 +640,8 @@
     <MESSAGE value="Terminado" />
     <MESSAGE value="inicio practica 2, obtener piramide gaussiana y derivadas" />
     <MESSAGE value="arreglado el error del tipo" />
-    <option name="LAST_COMMIT_MESSAGE" value="arreglado el error del tipo" />
+    <MESSAGE value="ya se obtiene la matriz harris" />
+    <option name="LAST_COMMIT_MESSAGE" value="ya se obtiene la matriz harris" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -886,8 +895,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Practica2/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="115" lean-forward="false" selection-start-line="6" selection-start-column="115" selection-end-line="6" selection-end-column="115" />
+        <state relative-caret-position="105">
+          <caret line="7" column="50" lean-forward="false" selection-start-line="7" selection-start-column="50" selection-end-line="7" selection-end-column="50" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
@@ -896,8 +905,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Practica2/functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-314">
-          <caret line="491" column="0" lean-forward="true" selection-start-line="491" selection-start-column="0" selection-end-line="491" selection-end-column="0" />
+        <state relative-caret-position="150">
+          <caret line="496" column="8" lean-forward="false" selection-start-line="496" selection-start-column="8" selection-end-line="496" selection-end-column="8" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>

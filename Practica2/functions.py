@@ -337,7 +337,7 @@ def subsample_image(img_src, subsample_factor = 2):
     return aux[:, range(0,anch, subsample_factor)]
 
 
-def generate_gaussian_piramide(img_src, subsample_factor, n_levels):
+def generate_gaussian_pyramide(img_src, subsample_factor, n_levels):
 
     gaussian_pyramid = []
 
@@ -412,7 +412,7 @@ def generate_new_pyramidal_canvas(img_src, times_to_show, subsample_factor = 2):
 
     print(times_to_show)
 
-    pyramide = generate_gaussian_piramide(img_src,subsample_factor,times_to_show)
+    pyramide = generate_gaussian_pyramide(img_src,subsample_factor,times_to_show)
 
     for i in range(1, times_to_show):
         # insertamos la imagen en el canvas
@@ -489,6 +489,12 @@ def local_maximun(environment):
     elif len(environment.shape) == 1:
         return environment[floor(len(environment)/2)]==np.max(environment)
 
+def set_down_to_zero(environment):
+    # Ponemos todos los elementos de la matriz e
+    environment[:,] = 0
+
+def get_local_maximun(img):
+    pass
 
 def extract_harris_points(img, blockS, kSize, thresdhold):
     # Extraemos las dimensiones de la imagen, para que,
@@ -497,41 +503,42 @@ def extract_harris_points(img, blockS, kSize, thresdhold):
     # podamos recuperar fácilmente las coordenadas de los puntos
     # harris.
     alt, anch = img.shape[:2]
-
+    # Ensanchamos una fila de la imagen
     if alt % 2 != 0 and anch % 2 == 0:
         aux = np.ones(shape=(alt+1, anch), dtype=np.uint8)
         insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
                               pixel_left_top_row=0, substitute=True)
+
+    # Ensanchamos una columna de la imagen
     elif alt % 2 == 0 and anch % 2 != 0:
         aux = np.ones(shape=(alt, anch+1), dtype=np.uint8)
         insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
                               pixel_left_top_row=0, substitute=True)
 
+    # Ensanchamos una fila y una columna de la imagen
     elif alt % 2 != 0 and anch % 2 != 0:
         aux = np.ones(shape=(alt+1, anch+1), dtype=np.uint8)
         insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
                               pixel_left_top_row=0, substitute=True)
-
+    # se queda igual que la original
     else:
         aux = np.copy(img)
+    
+    # obtenemos la pirámide gaussiana
+    pyramide = generate_gaussian_pyramide(img_src=aux, subsample_factor=2, n_levels=3)
 
-    pyramide = generate_gaussian_piramide(img_src=aux, subsample_factor=2, n_levels=3)
-
-    eingenValsAndVecs = []
+    eingen_vals_and_vecs = []
+    strong_values = []
 
     for im in pyramide:
+        # Obtenemos la matriz de con los autovalores de la matriz
+        # y los respectivos autovectores para cada uno de los autovalores
         result =cv2.split(cv2.cornerEigenValsAndVecs(src=im.astype(np.uint8), blockSize=blockS, ksize=kSize))
+        # Calculamos el determinante como el producto de los autovalores
         det = cv2.mulSpectrums(result[0], result[1], flags=cv2.DFT_ROWS)
+        # Calculamos la traza como la suma de los autovalores
         trace = result[0] + result[1]
-        eingenValsAndVecs.append(harrisCriterio(det, trace))
-        # show_img(eingenValsAndVecs[-1],'a')
-
-
-
-
-
-
-    # supresión de no máximos de la imagen.
-
-
-
+        # Realizamos la función de valoración de Harris
+        eingen_vals_and_vecs.append(harrisCriterio(det, trace))
+        # Y obtenemos los puntos que sobrepasan el umbral mínimo
+        strong_values.append(eingen_vals_and_vecs[-1] > thresdhold)
