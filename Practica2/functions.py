@@ -481,10 +481,6 @@ def local_maximun(environment):
     center = environment[floor(width/2),floor(height/2)]
     return center == np.min(environment)
 
-def set_down_to_zero(environment):
-    # Ponemos todos los elementos de la matriz e
-    environment[:,] = 0
-
 
 def get_local_maximun(imgs, index_mask, mask_size):
     # inicializamos una imagen binaria (0,255) para
@@ -563,6 +559,5 @@ def extract_harris_points(img, blockS, kSize, thresdhold):
     # pasamos a eliminar los no máximos
     best_points = get_local_maximun(imgs=eingen_vals_and_vecs,
                                     index_mask=strong_values, mask_size=3)
-
 
 
