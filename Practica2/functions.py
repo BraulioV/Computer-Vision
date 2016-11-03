@@ -410,8 +410,6 @@ def generate_new_pyramidal_canvas(img_src, times_to_show, subsample_factor = 2):
     if times_to_show > max:
         times_to_show = max
 
-    print(times_to_show)
-
     pyramide = generate_gaussian_pyramide(img_src,subsample_factor,times_to_show)
 
     for i in range(1, times_to_show):
@@ -479,42 +477,40 @@ harrisCriterio = lambda det, tr, k=0.04: det - k*(tr**2)
 # un máximo local o no
 def local_maximun(environment):
     floor = math.floor
-    # si el entorno es 2D, accedemos al centro dividiendo
-    # sus dimensiones entre dos y redondeando hacia abajo
-    # y comprobamos si es el máximo local o no
-    if len(environment.shape) == 2:
-        height, width = environment.shape[:2]
-        center = environment[floor(width/2),floor(height/2)]
-        return center == np.max(environment)
-    elif len(environment.shape) == 1:
-        return environment[floor(len(environment)/2)]==np.max(environment)
+    height, width = environment.shape[:2]
+    center = environment[floor(width/2),floor(height/2)]
+    return center == np.min(environment)
 
 def set_down_to_zero(environment):
     # Ponemos todos los elementos de la matriz e
     environment[:,] = 0
 
 
-def get_local_maximun(img, index_mask, mask_size):
+def get_local_maximun(imgs, index_mask, mask_size):
     # inicializamos una imagen binaria (0,255) para
     # representar los máximos locales de la imagen
-    matrix = np.zeros(shape=img.shape,dtype=np.uint8)
-    half_mask_size = math.floor(mask_size.shape[0]/2)
+    matrix = np.zeros(shape=imgs[0].shape,dtype=np.uint8)
+    half_mask_size = math.floor(mask_size/2)
     # obtenemos los índices de los puntos que han sobrepasado
     # el umbral mínimo
     escala = 1
+    img = 0
     for i in index_mask:
         rows = i[0]
         cols = i[1]
+        imgaux = extend_image_n_pixels(img_src=imgs[img], border_type=4, n_pixels=mask_size)
         for k in range(len(rows)):
-            left = rows[k]-half_mask_size
-            right = (rows[k]+half_mask_size+1)%img.shape[1]
-            top = cols[k] - half_mask_size
-            down = (cols[k] + half_mask_size + 1)%img.shape[0]
-
-            if local_maximun(img[left:right, top:down]):
+            left = rows[k]
+            right = (rows[k]+mask_size)
+            top = cols[k]
+            down = (cols[k] + mask_size)
+            if local_maximun(imgaux[left:right, top:down]):
                 matrix[rows[k]*escala,cols[k]*escala] = 255
 
+        img += 1
         escala *= 2
+
+    return matrix
 
 
 def extract_harris_points(img, blockS, kSize, thresdhold):
@@ -566,3 +562,6 @@ def extract_harris_points(img, blockS, kSize, thresdhold):
 
     # pasamos a eliminar los no máximos
 
+    best_points = get_local_maximun(imgs=eingen_vals_and_vecs, index_mask=strong_values, mask_size=3)
+
+    show_img(best_points, 'a')
