@@ -490,7 +490,6 @@ def get_local_maximun(imgs, index_mask, mask_size):
     # inicializamos una imagen binaria (0,255) para
     # representar los máximos locales de la imagen
     matrix = np.zeros(shape=imgs[0].shape,dtype=np.uint8)
-    half_mask_size = math.floor(mask_size/2)
     # obtenemos los índices de los puntos que han sobrepasado
     # el umbral mínimo
     escala = 1
@@ -550,7 +549,8 @@ def extract_harris_points(img, blockS, kSize, thresdhold):
     for im in pyramide:
         # Obtenemos la matriz de con los autovalores de la matriz
         # y los respectivos autovectores para cada uno de los autovalores
-        result =cv2.split(cv2.cornerEigenValsAndVecs(src=im.astype(np.uint8), blockSize=blockS, ksize=kSize))
+        result =cv2.split(cv2.cornerEigenValsAndVecs(src=im.astype(np.uint8),
+                                                     blockSize=blockS, ksize=kSize))
         # Calculamos el determinante como el producto de los autovalores
         det = cv2.mulSpectrums(result[0], result[1], flags=cv2.DFT_ROWS)
         # Calculamos la traza como la suma de los autovalores
@@ -561,7 +561,8 @@ def extract_harris_points(img, blockS, kSize, thresdhold):
         strong_values.append(np.where(eingen_vals_and_vecs[-1] > thresdhold))
 
     # pasamos a eliminar los no máximos
+    best_points = get_local_maximun(imgs=eingen_vals_and_vecs,
+                                    index_mask=strong_values, mask_size=3)
 
-    best_points = get_local_maximun(imgs=eingen_vals_and_vecs, index_mask=strong_values, mask_size=3)
 
-    show_img(best_points, 'a')
+
