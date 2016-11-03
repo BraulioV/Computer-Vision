@@ -493,8 +493,29 @@ def set_down_to_zero(environment):
     # Ponemos todos los elementos de la matriz e
     environment[:,] = 0
 
-def get_local_maximun(img):
-    pass
+
+def get_local_maximun(img, index_mask, mask_size):
+    # inicializamos una imagen binaria (0,255) para
+    # representar los máximos locales de la imagen
+    matrix = np.zeros(shape=img.shape,dtype=np.uint8)
+    half_mask_size = math.floor(mask_size.shape[0]/2)
+    # obtenemos los índices de los puntos que han sobrepasado
+    # el umbral mínimo
+    escala = 1
+    for i in index_mask:
+        rows = i[0]
+        cols = i[1]
+        for k in range(len(rows)):
+            left = rows[k]-half_mask_size
+            right = (rows[k]+half_mask_size+1)%img.shape[1]
+            top = cols[k] - half_mask_size
+            down = (cols[k] + half_mask_size + 1)%img.shape[0]
+
+            if local_maximun(img[left:right, top:down]):
+                matrix[rows[k]*escala,cols[k]*escala] = 255
+
+        escala *= 2
+
 
 def extract_harris_points(img, blockS, kSize, thresdhold):
     # Extraemos las dimensiones de la imagen, para que,
@@ -540,5 +561,8 @@ def extract_harris_points(img, blockS, kSize, thresdhold):
         trace = result[0] + result[1]
         # Realizamos la función de valoración de Harris
         eingen_vals_and_vecs.append(harrisCriterio(det, trace))
-        # Y obtenemos los puntos que sobrepasan el umbral mínimo
-        strong_values.append(eingen_vals_and_vecs[-1] > thresdhold)
+        # Y obtenemos los índices de los píxeles que sobrepasan el umbral mínimo
+        strong_values.append(np.where(eingen_vals_and_vecs[-1] > thresdhold))
+
+    # pasamos a eliminar los no máximos
+
