@@ -479,36 +479,49 @@ def local_maximun(environment):
     floor = math.floor
     height, width = environment.shape[:2]
     center = environment[floor(width/2),floor(height/2)]
-    return center == np.min(environment)
+    return center == np.max(environment)
 
 
 def get_local_maximun(imgs, index_mask, mask_size):
-    # inicializamos una imagen binaria (0,255) para
-    # representar los máximos locales de la imagen
-    matrix = np.zeros(shape=imgs[0].shape,dtype=np.uint8)
     # obtenemos los índices de los puntos que han sobrepasado
     # el umbral mínimo
     escala = 1
     img = 0
+    xy_bests_points = []
+    harrisV_bests_points = []
+    coord_x = []
+    coord_y = []
     for i in index_mask:
         rows = i[0]
         cols = i[1]
         imgaux = extend_image_n_pixels(img_src=imgs[img], border_type=4, n_pixels=mask_size)
+        maxls_xy = []
+        maxHs = []
         for k in range(len(rows)):
+            # Obtenemos las cuatro esquinas de la región a analizar
             left = rows[k]
             right = (rows[k]+mask_size)
             top = cols[k]
             down = (cols[k] + mask_size)
+            # Y comprobamos si la región contiene en su centro un máximo local
             if local_maximun(imgaux[left:right, top:down]):
-                matrix[rows[k]*escala,cols[k]*escala] = 255
+                # si lo es, almacenamos su posición y su valor harris
+                # maxls_xy.append([rows[k]*escala,cols[k]*escala])
+                coord_x.append(rows[k] * escala)
+                coord_y.append(cols[k] * escala)
+                maxHs.append(imgs[img][rows[k],cols[k]])
 
+        # Insertamos los puntos máximos y su valor en la lista
+        xy_bests_points.append(np.array([np.array(coord_x), np.array(coord_y)]))
+        # xy_bests_points.append(maxls_xy)
+        harrisV_bests_points.append(maxHs)
         img += 1
         escala *= 2
 
-    return matrix
+    return xy_bests_points, harrisV_bests_points # harrisV_bests_points[0], harrisV_bests_points[1], harrisV_bests_points[2]
 
 
-def extract_harris_points(img, blockS, kSize, thresdhold):
+def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
     # Extraemos las dimensiones de la imagen, para que,
     # en caso de que sean de tamaño impar, añadirle una fila
     # o columna según corresponda, para que, al reducir,
@@ -557,7 +570,27 @@ def extract_harris_points(img, blockS, kSize, thresdhold):
         strong_values.append(np.where(eingen_vals_and_vecs[-1] > thresdhold))
 
     # pasamos a eliminar los no máximos
-    best_points = get_local_maximun(imgs=eingen_vals_and_vecs,
-                                    index_mask=strong_values, mask_size=3)
+    xy_points, harrisV = get_local_maximun(imgs=eingen_vals_and_vecs,
+                                           index_mask=strong_values,
+                                           mask_size=3)
+    # inicializamos una imagen binaria (0,255) para
+    # representar los máximos locales de la imagen
+    img_points = np.zeros(shape=img.shape,dtype=np.uint8)
 
+    # Pasamos a poner a 1 los puntos con máximos locales
+    it = 0
+    floor = math.floor
+    # Esto representa el porcentaje de puntos que tomaremos de cada escala
+    # tomando del primer nivel el 70%, del segundo el 20% y del último el 10%
+    percentages = [.7, .2, .1]
+    # Empezamos a recorrer los puntos que hemos extraído como máximos locales
+    for points in harrisV:
+        # ordenamos los puntos
+        index = np.argsort(points)
+        # tomamos las coordenadas del % de puntos mejores
+        coord_xy = [xy_points[it][0][index[0:floor(n_points * percentages[it])]],
+                    xy_points[it][1][index[0:floor(n_points * percentages[it])]]]
+        # y los ponemos a 1
+        img_points[coord_xy] = 255
 
+    show_img(img_points, 'a')
