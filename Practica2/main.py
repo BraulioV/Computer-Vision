@@ -5,4 +5,4 @@ if __name__ == '__main__':
     # tablero = cv2.imread('imagenes/Tablero1.jpg', flags=cv2.IMREAD_GRAYSCALE)
     # fx.show_img(tablero, 'Piramide gaussiana')
     fx.extract_harris_points(cv2.imread('imagenes/Tablero1.jpg', flags=cv2.IMREAD_GRAYSCALE), blockS = 3,
-                             kSize = 5, thresdhold=0.00001)
+                             kSize = 5, thresdhold=0.000001)

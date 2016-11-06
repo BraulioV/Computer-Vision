@@ -586,11 +586,14 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
     # Empezamos a recorrer los puntos que hemos extraído como máximos locales
     for points in harrisV:
         # ordenamos los puntos
-        index = np.argsort(points)
+        index = np.argsort(points)[::-1]
+        print(floor(n_points*percentages[it]))
+        print(len(index[0:floor(n_points * percentages[it])]))
         # tomamos las coordenadas del % de puntos mejores
         coord_xy = [xy_points[it][0][index[0:floor(n_points * percentages[it])]],
                     xy_points[it][1][index[0:floor(n_points * percentages[it])]]]
         # y los ponemos a 1
         img_points[coord_xy] = 255
+        it+=1
 
     show_img(img_points, 'a')
