@@ -494,13 +494,10 @@ def get_local_maximun(imgs, index_mask, mask_size):
         coord_y = []
         rows = i[0]
         cols = i[1]
-        print(imgs[img].shape)
 
         imgaux = extend_image_n_pixels(img_src=imgs[img],
                                        border_type=4,
                                        n_pixels=mask_size)
-        print(imgaux.shape)
-
         maxHs = []
         for k in range(len(rows)):
             # Obtenemos las cuatro esquinas de la región a analizar
@@ -511,8 +508,6 @@ def get_local_maximun(imgs, index_mask, mask_size):
             # Y comprobamos si la región contiene en su centro un máximo local
             if local_maximun(imgaux[left:right, top:down]):
                 # si lo es, almacenamos su posición y su valor harris
-                # coord_x.append(rows[k] * escala)
-                # coord_y.append(cols[k] * escala)
                 coord_x.append(rows[k])
                 coord_y.append(cols[k])
                 maxHs.append(imgs[img][rows[k],cols[k]])
@@ -594,7 +589,6 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
     escala = 1
 
     for points in harrisV:
-        print(len(xy_points[it][0][xy_points[it][0] > 640/escala]))
         # ordenamos los puntos
         index = np.argsort(points)[::-1]
         # tomamos las coordenadas del % de puntos mejores
