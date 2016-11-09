@@ -10,6 +10,7 @@ import numpy as np
 #      (-0.5*-----------)
 #   e^         sigma^2
 #
+from django.template.defaultfilters import center
 from numpy.core.multiarray import einsum
 
 fx = lambda x, sigma: math.exp(-0.5 * (x ** 2 / sigma ** 2))
@@ -584,16 +585,33 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
     # tomando del primer nivel el 70%, del segundo el 20% y del último el 10%
     percentages = [.7, .2, .1]
     # Empezamos a recorrer los puntos que hemos extraído como máximos locales
+    coordinates_for_circles = []
     for points in harrisV:
         # ordenamos los puntos
         index = np.argsort(points)[::-1]
-        print(floor(n_points*percentages[it]))
-        print(len(index[0:floor(n_points * percentages[it])]))
         # tomamos las coordenadas del % de puntos mejores
         coord_xy = [xy_points[it][0][index[0:floor(n_points * percentages[it])]],
                     xy_points[it][1][index[0:floor(n_points * percentages[it])]]]
+        # Almacenamos los puntos en una lista para poder
+        # dibujar los círculos
+        coordinates_for_circles.append([xy_points[it][1][index[0:floor(n_points * percentages[it])]],
+                       xy_points[it][0][index[0:floor(n_points * percentages[it])]],])
         # y los ponemos a 1
         img_points[coord_xy] = 255
         it+=1
 
+    # Pasamos a pintar los puntos seleccionados en la imagen original
+    # colocando un círculo de color rojo sobre esta, con radio proporcional
+    # a la escala en la que se ha obtenido este punto
+    it = 10
+    for coordinates in coordinates_for_circles:
+        print("holi")
+        for i in range(len(coordinates[0])):
+            # a=coordinates
+            # print(a[0][i])
+            cv2.circle(img = aux, center = (coordinates[0][i],coordinates[1][i]),
+                       radius = it, color=0)
+        it = floor(it/2)
+
     show_img(img_points, 'a')
+    show_img(aux, 'a')
