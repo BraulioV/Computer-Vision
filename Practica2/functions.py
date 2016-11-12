@@ -490,14 +490,17 @@ def get_local_maximun(imgs, index_mask, mask_size):
     xy_bests_points = []
     harrisV_bests_points = []
     for i in index_mask:
+        # Arrays para almacenar las coordenadas en X y en Y
         coord_x = []
         coord_y = []
         rows = i[0]
         cols = i[1]
-
+        # Extendemos la imagen para poder captar fácilmente
+        # los máximos locales de los bordes
         imgaux = extend_image_n_pixels(img_src=imgs[img],
                                        border_type=4,
                                        n_pixels=mask_size)
+        # Array para almacenar los máximos locales almacenados
         maxHs = []
         for k in range(len(rows)):
             # Obtenemos las cuatro esquinas de la región a analizar
@@ -519,7 +522,7 @@ def get_local_maximun(imgs, index_mask, mask_size):
         img += 1
         escala *= 2
 
-    return xy_bests_points, harrisV_bests_points # harrisV_bests_points[0], harrisV_bests_points[1], harrisV_bests_points[2]
+    return xy_bests_points, harrisV_bests_points
 
 
 def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
@@ -587,17 +590,25 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
     # Empezamos a recorrer los puntos que hemos extraído como máximos locales
     coordinates_for_circles = []
     escala = 1
-
+    selected_points = []
     for points in harrisV:
-        # ordenamos los puntos
+        # ordenamos los puntos. Como argsort los da ordenados
+        # de menor a mayor, invertimos el vector para obtenerlos
+        # de mayor a menor.
         index = np.argsort(points)[::-1]
         # tomamos las coordenadas del % de puntos mejores
-        coord_xy = [xy_points[it][0][index[0:floor(n_points * percentages[it])]]*escala,
-                    xy_points[it][1][index[0:floor(n_points * percentages[it])]]*escala]
+        coord_xy = [xy_points[it][0][index[0:floor(n_points * percentages[it])]],
+                    xy_points[it][1][index[0:floor(n_points * percentages[it])]]]
+
+        # Almacenamos los mejores puntos de cada escala
+        # ya ordenados, y sin
+        selected_points.append(coord_xy)
+        
         # Almacenamos los puntos en una lista para poder
         # dibujar los círculos
-        coordinates_for_circles.append([xy_points[it][1][index[0:floor(n_points * percentages[it])]]*escala,
-                                        xy_points[it][0][index[0:floor(n_points * percentages[it])]]*escala,])
+        #coordinates_for_circles.append([xy_points[it][1][index[0:floor(n_points * percentages[it])]]*escala,
+        #                                xy_points[it][0][index[0:floor(n_points * percentages[it])]]*escala,])
+        coordinates_for_circles.append(coord_xy*escala)
         # y los ponemos a 1
         img_points[coord_xy] = 255
         it+=1
@@ -606,12 +617,14 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
     # Pasamos a pintar los puntos seleccionados en la imagen original
     # colocando un círculo de color rojo sobre esta, con radio proporcional
     # a la escala en la que se ha obtenido este punto
-    it = 10
+    circle_radius = 10
     for coordinates in coordinates_for_circles:
         for i in range(len(coordinates[0])):
             cv2.circle(img = aux, center = (coordinates[0][i],coordinates[1][i]),
-                       radius = it, color=0)
-        it = floor(it/2)
+                       radius = circle_radius, color=0)
+        circle_radius = floor(circle_radius/2)
 
     show_img(img_points, 'a')
     show_img(aux, 'a')
+
+    
