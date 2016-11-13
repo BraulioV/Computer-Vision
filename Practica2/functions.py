@@ -602,13 +602,13 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
 
         # Almacenamos los mejores puntos de cada escala
         # ya ordenados, y sin
-        selected_points.append(coord_xy)
+        selected_points.append(np.array(coord_xy).T)
         
         # Almacenamos los puntos en una lista para poder
         # dibujar los círculos
-        #coordinates_for_circles.append([xy_points[it][1][index[0:floor(n_points * percentages[it])]]*escala,
-        #                                xy_points[it][0][index[0:floor(n_points * percentages[it])]]*escala,])
-        coordinates_for_circles.append(coord_xy*escala)
+        coordinates_for_circles.append([xy_points[it][1][index[0:floor(n_points * percentages[it])]]*escala,
+                                       xy_points[it][0][index[0:floor(n_points * percentages[it])]]*escala,])
+        # coordinates_for_circles.append(coord_xy*escala)
         # y los ponemos a 1
         img_points[coord_xy] = 255
         it+=1
@@ -617,14 +617,63 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
     # Pasamos a pintar los puntos seleccionados en la imagen original
     # colocando un círculo de color rojo sobre esta, con radio proporcional
     # a la escala en la que se ha obtenido este punto
-    circle_radius = 10
+    circle_radius = [10, 3, 1]
+    it = 0
+    aux2 = np.copy(aux)
     for coordinates in coordinates_for_circles:
         for i in range(len(coordinates[0])):
             cv2.circle(img = aux, center = (coordinates[0][i],coordinates[1][i]),
-                       radius = circle_radius, color=0)
-        circle_radius = floor(circle_radius/2)
+                       radius = circle_radius[it], color=0)
+        it += 1
 
-    show_img(img_points, 'a')
-    show_img(aux, 'a')
+    #######################################
+    # Apartado b, refinar las coordenadas
+    #######################################
+    refined_points = []
+    it = 0
+
+    for img in pyramide:
+        float_esquinas = np.array(selected_points[it], dtype=np.float32).copy()
+        cv2.cornerSubPix(image=img.astype(np.float32), corners = float_esquinas,
+                         winSize = (5,5), zeroZone = (-1,-1),
+                         criteria = (cv2.TERM_CRITERIA_MAX_ITER | cv2.TERM_CRITERIA_COUNT, 10, 0.01))
+        it+=1
+        refined_points.append(float_esquinas)
+
+    indices = refined_points[0].T.astype(int)
+    it = 0
+    escala = 1
+    for coordinates in refined_points:
+        for point in coordinates:
+            cv2.circle(img=aux2, center=(int(point[1]*escala), int(point[0]*escala)),
+                       radius=circle_radius[it], color=0)
+        it += 1
+        escala*=2
+
+    ####################################
+    # Apartado c, detectar orientacion
+    ####################################
+    #
+    for scale in range(3):
+        derivated_img = my_im_gauss_convolution(im = pyramide[scale], mask_convolution = get_mask_vector(4.5))
+        result = cv2.split(cv2.cornerEigenValsAndVecs(src=derivated_img.astype(np.uint8),
+                                                      blockSize=blockS, ksize=kSize))
+        # for point in refined_points[scale]:
+        #     eigenvector1x = np.matrix(result[2])
+        #     eigenvector2y = result[3]
+        #     compx = eigenvector1x[int(point[0]), int(point[1])]
+            # compy = eigenvector1x[point.astype(np.int)]
+        # np.delete(refined_points[scale], np.where(refined_points[scale][:,0] > 480)[0][0])
+        indices = refined_points[scale].T.astype(int)
+        lambda1_X, lambda1Y = result[2][indices], result[3][indices]
+        lambda2_XY = np.linalg.norm(result[4:][indices])
+    #
+    #
+    #
+    #
+
+    # show_img(aux, 'antes')
+    # show_img(aux2, 'despues')
+
 
     
