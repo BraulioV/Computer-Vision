@@ -640,7 +640,6 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
         it+=1
         refined_points.append(float_esquinas)
 
-    indices = refined_points[0].T.astype(int)
     it = 0
     escala = 1
     for coordinates in refined_points:
@@ -654,6 +653,7 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
     # Apartado c, detectar orientacion
     ####################################
     #
+    refined_points[0] = np.delete(refined_points[0], np.where(refined_points[0][:, 0] > alt)[0][0], 0)
     for scale in range(3):
         derivated_img = my_im_gauss_convolution(im = pyramide[scale], mask_convolution = get_mask_vector(4.5))
         result = cv2.split(cv2.cornerEigenValsAndVecs(src=derivated_img.astype(np.uint8),
@@ -663,10 +663,10 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
         #     eigenvector2y = result[3]
         #     compx = eigenvector1x[int(point[0]), int(point[1])]
             # compy = eigenvector1x[point.astype(np.int)]
-        # np.delete(refined_points[scale], np.where(refined_points[scale][:,0] > 480)[0][0])
-        indices = refined_points[scale].T.astype(int)
-        lambda1_X, lambda1Y = result[2][indices], result[3][indices]
-        lambda2_XY = np.linalg.norm(result[4:][indices])
+        indices = np.array(refined_points[scale].T, dtype=int)
+        lambda1_X= result[2][indices[0], indices[1]]
+        lambda1_Y = result[3][indices[0], indices[1]]
+        # lambda2_XY = np.linalg.norm(result[4:][indices])
     #
     #
     #
