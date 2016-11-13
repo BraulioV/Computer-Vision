@@ -525,45 +525,48 @@ def get_local_maximun(imgs, index_mask, mask_size):
     return xy_bests_points, harrisV_bests_points
 
 
-def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
+def prepare_img_to_harris_points(img):
     # Extraemos las dimensiones de la imagen, para que,
     # en caso de que sean de tamaño impar, añadirle una fila
     # o columna según corresponda, para que, al reducir,
     # podamos recuperar fácilmente las coordenadas de los puntos
     # harris.
     alt, anch = img.shape[:2]
+
+    aux=[]
     # Ensanchamos una fila de la imagen
     if alt % 4 != 0 and anch % 4 == 0:
-        aux = np.ones(shape=(alt+alt%4, anch), dtype=np.uint8)
+        aux = np.ones(shape=(alt + alt % 4, anch), dtype=np.uint8)
         insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
                               pixel_left_top_row=0, substitute=True)
 
     # Ensanchamos una columna de la imagen
     elif alt % 4 == 0 and anch % 4 != 0:
-        aux = np.ones(shape=(alt, anch+anch%4), dtype=np.uint8)
+        aux = np.ones(shape=(alt, anch + anch % 4), dtype=np.uint8)
         insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
                               pixel_left_top_row=0, substitute=True)
 
     # Ensanchamos una fila y una columna de la imagen
     elif alt % 4 != 0 and anch % 4 != 0:
-        aux = np.ones(shape=(alt+alt%4, anch+anch%4), dtype=np.uint8)
+        aux = np.ones(shape=(alt + alt % 4, anch + anch % 4), dtype=np.uint8)
         insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
                               pixel_left_top_row=0, substitute=True)
     # se queda igual que la original
     else:
         aux = np.copy(img)
-    
-    # obtenemos la pirámide gaussiana
-    pyramide = generate_gaussian_pyramide(img_src=aux, subsample_factor=2, n_levels=3)
 
+    return aux
+
+
+def get_eigenVals_and_eigenVecs(pyramide, thresdhold, blockS, kSize):
     eingen_vals_and_vecs = []
     strong_values = []
 
     for im in pyramide:
         # Obtenemos la matriz de con los autovalores de la matriz
         # y los respectivos autovectores para cada uno de los autovalores
-        result =cv2.split(cv2.cornerEigenValsAndVecs(src=im.astype(np.uint8),
-                                                     blockSize=blockS, ksize=kSize))
+        result = cv2.split(cv2.cornerEigenValsAndVecs(src=im.astype(np.uint8),
+                                                      blockSize=blockS, ksize=kSize))
         # Calculamos el determinante como el producto de los autovalores
         det = cv2.mulSpectrums(result[0], result[1], flags=cv2.DFT_ROWS)
         # Calculamos la traza como la suma de los autovalores
@@ -572,6 +575,24 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
         eingen_vals_and_vecs.append(harrisCriterio(det, trace))
         # Y obtenemos los índices de los píxeles que sobrepasan el umbral mínimo
         strong_values.append(np.where(eingen_vals_and_vecs[-1] > thresdhold))
+
+    return eingen_vals_and_vecs, strong_values
+
+def get_best_points():
+    pass
+
+
+def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
+
+    alt, anch = img.shape[:2]
+    aux = prepare_img_to_harris_points(img)
+    # obtenemos la pirámide gaussiana
+    pyramide = generate_gaussian_pyramide(img_src=aux, subsample_factor=2, n_levels=3)
+
+    # Obtenemos los autovalores y autovectores, junto
+    # con los puntos que superan el umbral
+    eingen_vals_and_vecs, strong_values = \
+        get_eigenVals_and_eigenVecs(pyramide, thresdhold, blockS, kSize)
 
     # pasamos a eliminar los no máximos
     xy_points, harrisV = get_local_maximun(imgs=eingen_vals_and_vecs,
@@ -653,27 +674,33 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
     # Apartado c, detectar orientacion
     ####################################
     #
-    refined_points[0] = np.delete(refined_points[0], np.where(refined_points[0][:, 0] > alt)[0][0], 0)
     for scale in range(3):
-        derivated_img = my_im_gauss_convolution(im = pyramide[scale], mask_convolution = get_mask_vector(4.5))
+        derivated_img = my_im_gauss_convolution(im = pyramide[scale],
+                                                mask_convolution = get_mask_vector(4.5))
         result = cv2.split(cv2.cornerEigenValsAndVecs(src=derivated_img.astype(np.uint8),
                                                       blockSize=blockS, ksize=kSize))
-        # for point in refined_points[scale]:
-        #     eigenvector1x = np.matrix(result[2])
-        #     eigenvector2y = result[3]
-        #     compx = eigenvector1x[int(point[0]), int(point[1])]
-            # compy = eigenvector1x[point.astype(np.int)]
+        # Eliminamos los posibles puntos que se puedan pasar
+        # del tamaño de la imagen
+        refined_points[scale] = np.delete(refined_points[scale],
+                                          np.where(refined_points[scale][:, 0] > alt), 0)
+        # Obtenemos la lista de índices
         indices = np.array(refined_points[scale].T, dtype=int)
-        lambda1_X= result[2][indices[0], indices[1]]
-        lambda1_Y = result[3][indices[0], indices[1]]
-        # lambda2_XY = np.linalg.norm(result[4:][indices])
-    #
-    #
-    #
-    #
+        # obtenemos los lambdas de dichos puntos
+        # lambda1 = result[0][indices[0], indices[1]]
+        # lambda2 = result[1][indices[0], indices[1]]
+        # donde_l2 = np.where(lambda1 > lambda2)
+        # print(donde_l2)
+        # Obtenemos los autovectores de lambda1
+        eigenV_X= result[2][indices[0], indices[1]]
+        eigenV_Y = result[3][indices[0], indices[1]]
+        vector1 = np.vstack((eigenV_X, eigenV_Y)).T
+        # Obtenemos los autovectores de lambda2
+        # eigenV_X1 = result[4][indices[0], indices[1]]
+        # eigenV_Y1 = result[5][indices[0], indices[1]]
+        # vector2 = np.vstack((eigenV_X1, eigenV_Y1)).T
 
-    # show_img(aux, 'antes')
-    # show_img(aux2, 'despues')
+        # show_img(aux, 'antes')
+        # show_img(aux2, 'despues')
 
 
     

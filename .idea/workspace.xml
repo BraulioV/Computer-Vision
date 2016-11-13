@@ -22,7 +22,7 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Computer-Vision$functions__1_.coverage" NAME="functions (1) Coverage Results" MODIFIED="1478087209825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
     <SUITE FILE_PATH="coverage/Computer-Vision$main.coverage" NAME="main Coverage Results" MODIFIED="1477307715097" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica1" />
-    <SUITE FILE_PATH="coverage/Computer-Vision$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1479058026016" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
+    <SUITE FILE_PATH="coverage/Computer-Vision$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1479065225255" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
     <SUITE FILE_PATH="coverage/Computer-Vision$functions.coverage" NAME="functions Coverage Results" MODIFIED="1476455446989" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica1" />
   </component>
   <component name="CreatePatchCommitExecutor">
@@ -37,8 +37,8 @@
       <file leaf-file-name="functions.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Practica2/functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="647">
-              <caret line="669" column="5" selection-start-line="669" selection-start-column="5" selection-end-line="669" selection-end-column="5" />
+            <state relative-caret-position="338">
+              <caret line="635" column="17" selection-start-line="635" selection-start-column="17" selection-end-line="635" selection-end-column="17" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -652,7 +652,14 @@
       <option name="project" value="LOCAL" />
       <updated>1479056803561</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="ya no explota">
+      <created>1479058087553</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1479058087553</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -734,7 +741,8 @@
     <MESSAGE value="corregido un fallo en la detección de esquinas, y ahora no se reescalan los puntos manteniendose la escala inicial" />
     <MESSAGE value="fuera prints" />
     <MESSAGE value="no funciona indexing" />
-    <option name="LAST_COMMIT_MESSAGE" value="no funciona indexing" />
+    <MESSAGE value="ya no explota" />
+    <option name="LAST_COMMIT_MESSAGE" value="ya no explota" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -748,7 +756,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="44" />
+      <option name="time" value="45" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1224,8 +1232,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Practica2/functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="647">
-          <caret line="669" column="5" selection-start-line="669" selection-start-column="5" selection-end-line="669" selection-end-column="5" />
+        <state relative-caret-position="338">
+          <caret line="635" column="17" selection-start-line="635" selection-start-column="17" selection-end-line="635" selection-end-column="17" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
