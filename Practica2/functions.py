@@ -199,8 +199,8 @@ def get_derivates_of(img, sigma=1):
 
     extended_image = extend_image_n_pixels(img, n_pixels, border_type = 0)
 
-    return (derivate_img_on_x(gaussian_mask, extended_image, n_pixels),
-            derivate_img_on_y(gaussian_mask, extended_image, n_pixels))
+    return derivate_img_on_x(gaussian_mask, extended_image, n_pixels)[n_pixels:-n_pixels, n_pixels:-n_pixels], \
+           derivate_img_on_y(gaussian_mask, extended_image, n_pixels)[n_pixels:-n_pixels, n_pixels:-n_pixels]
 
 
 def convolution_grey_scale_img(mask, img, n_pixels):
@@ -624,11 +624,11 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
         # Almacenamos los mejores puntos de cada escala
         # ya ordenados, y sin
         selected_points.append(np.array(coord_xy).T)
-        
+
         # Almacenamos los puntos en una lista para poder
         # dibujar los círculos
         coordinates_for_circles.append([xy_points[it][1][index[0:floor(n_points * percentages[it])]]*escala,
-                                       xy_points[it][0][index[0:floor(n_points * percentages[it])]]*escala,])
+                                        xy_points[it][0][index[0:floor(n_points * percentages[it])]]*escala,])
         # coordinates_for_circles.append(coord_xy*escala)
         # y los ponemos a 1
         img_points[coord_xy] = 255
@@ -661,46 +661,53 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
         it+=1
         refined_points.append(float_esquinas)
 
-    it = 0
-    escala = 1
-    for coordinates in refined_points:
-        for point in coordinates:
-            cv2.circle(img=aux2, center=(int(point[1]*escala), int(point[0]*escala)),
-                       radius=circle_radius[it], color=0)
-        it += 1
-        escala*=2
 
     ####################################
     # Apartado c, detectar orientacion
     ####################################
-    #
+    angles = []
     for scale in range(3):
-        derivated_img = my_im_gauss_convolution(im = pyramide[scale],
-                                                mask_convolution = get_mask_vector(4.5))
-        result = cv2.split(cv2.cornerEigenValsAndVecs(src=derivated_img.astype(np.uint8),
-                                                      blockSize=blockS, ksize=kSize))
+        dx_img, dy_img = get_derivates_of(img=pyramide[scale], sigma=4.5)
         # Eliminamos los posibles puntos que se puedan pasar
         # del tamaño de la imagen
         refined_points[scale] = np.delete(refined_points[scale],
                                           np.where(refined_points[scale][:, 0] > alt), 0)
-        # Obtenemos la lista de índices
+        # Obtenemos los indices para poder
         indices = np.array(refined_points[scale].T, dtype=int)
-        # obtenemos los lambdas de dichos puntos
-        # lambda1 = result[0][indices[0], indices[1]]
-        # lambda2 = result[1][indices[0], indices[1]]
-        # donde_l2 = np.where(lambda1 > lambda2)
-        # print(donde_l2)
-        # Obtenemos los autovectores de lambda1
-        eigenV_X= result[2][indices[0], indices[1]]
-        eigenV_Y = result[3][indices[0], indices[1]]
-        vector1 = np.vstack((eigenV_X, eigenV_Y)).T
-        # Obtenemos los autovectores de lambda2
-        # eigenV_X1 = result[4][indices[0], indices[1]]
-        # eigenV_Y1 = result[5][indices[0], indices[1]]
-        # vector2 = np.vstack((eigenV_X1, eigenV_Y1)).T
+        angles.append(np.arctan2(dy_img[indices[0],indices[1]], dx_img[indices[0],indices[1]]))
 
         # show_img(aux, 'antes')
         # show_img(aux2, 'despues')
+    sin = np.sin
+    cos = np.cos
+    it = 0
+    escala = 1
+    for coordinates in refined_points:
+        angle_it = 0
+        for point in coordinates:
+            point1 = int(point[1] * escala)
+            point2 = int(point[0] * escala)
+            cv2.circle(img=aux2, center=(point1, point2),
+                       radius=circle_radius[it], color=0)
+            # cv2.line(img, pt1, pt2, color[, thickness[, lineType[, shift]]]) → None¶
+            cv2.line(img=aux2, pt1=(point1, point2),
+                     pt2=(int(point1+sin(angles[it][angle_it])*circle_radius[it]),
+                          int(point2+cos(angles[it][angle_it])*circle_radius[it])),
+                     color=(0))
+        it += 1
+        escala *= 2
 
 
-    
+# ######################################################################
+def descriptor_matcher(imgs, thredshold):
+    detector = cv2.AKAZE_create()
+    # detector = cv2.AKAZE_create(descriptor_type=cv2.AKAZE_DESCRIPTOR_KAZE,
+    #                  descriptor_channels=n_channels,threshold=thredshold)
+    # detectamos y computamos los keypoints y los descriptores
+    # los almacenamos en una tupla
+    KP_Dr = []
+    for img in imgs:
+        (keypoints, descriptors) = detector.detectAndCompute(img, None)
+        KP_Dr.append(KP_Dr)
+
+
