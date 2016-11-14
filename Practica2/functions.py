@@ -674,10 +674,9 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
                                           np.where(refined_points[scale][:, 0] > alt), 0)
         # Obtenemos los indices para poder
         indices = np.array(refined_points[scale].T, dtype=int)
-        angles.append(np.arctan2(dy_img[indices[0],indices[1]], dx_img[indices[0],indices[1]]))
-
+        angles.append((np.arctan2(dy_img[indices[0],indices[1]], dx_img[indices[0],indices[1]])))
         # show_img(aux, 'antes')
-        # show_img(aux2, 'despues')
+
     sin = np.sin
     cos = np.cos
     it = 0
@@ -689,7 +688,7 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
             point2 = int(point[0] * escala)
             cv2.circle(img=aux2, center=(point1, point2),
                        radius=circle_radius[it], color=0)
-            # cv2.line(img, pt1, pt2, color[, thickness[, lineType[, shift]]]) → None¶
+
             cv2.line(img=aux2, pt1=(point1, point2),
                      pt2=(int(point1+sin(angles[it][angle_it])*circle_radius[it]),
                           int(point2+cos(angles[it][angle_it])*circle_radius[it])),
@@ -697,17 +696,32 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
         it += 1
         escala *= 2
 
+    show_img(aux2, 'despues')
 
 # ######################################################################
-def descriptor_matcher(imgs, thredshold):
+def descriptor_matcher(img1, img2, thredshold):
     detector = cv2.AKAZE_create()
     # detector = cv2.AKAZE_create(descriptor_type=cv2.AKAZE_DESCRIPTOR_KAZE,
     #                  descriptor_channels=n_channels,threshold=thredshold)
     # detectamos y computamos los keypoints y los descriptores
     # los almacenamos en una tupla
-    KP_Dr = []
-    for img in imgs:
-        (keypoints, descriptors) = detector.detectAndCompute(img, None)
-        KP_Dr.append(KP_Dr)
+    # KP_Dr = []
+
+    keypoints1, descriptors1 = detector.detectAndCompute(img1, None)
+    keypoints2, descriptors2 = detector.detectAndCompute(img2, None)
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING)
+    matches = bf.knnMatch(descriptors1,descriptors2, k=2)
+
+    # Apply ratio test
+    good = []
+    for m, n in matches:
+        if m.distance < 0.9 * n.distance:
+            good.append([m])
+
+    im3 = cv2.drawMatchesKnn(im1, keypoints1, im2, keypoints2, good[1:20], None, flags=2)
+    cv2.imshow("AKAZE matching", im3)
+    cv2.waitKey(0)
+            # KP_Dr.append(KP_Dr)
+
 
 
