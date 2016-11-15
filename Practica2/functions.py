@@ -533,27 +533,28 @@ def prepare_img_to_harris_points(img):
     # harris.
     alt, anch = img.shape[:2]
 
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     aux=[]
     # Ensanchamos una fila de la imagen
     if alt % 4 != 0 and anch % 4 == 0:
         aux = np.ones(shape=(alt + alt % 4, anch), dtype=np.uint8)
-        insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
+        insert_img_into_other(img_src=gray_img, img_dest=aux, pixel_left_top_col=0,
                               pixel_left_top_row=0, substitute=True)
 
     # Ensanchamos una columna de la imagen
     elif alt % 4 == 0 and anch % 4 != 0:
         aux = np.ones(shape=(alt, anch + anch % 4), dtype=np.uint8)
-        insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
+        insert_img_into_other(img_src=gray_img, img_dest=aux, pixel_left_top_col=0,
                               pixel_left_top_row=0, substitute=True)
 
     # Ensanchamos una fila y una columna de la imagen
     elif alt % 4 != 0 and anch % 4 != 0:
         aux = np.ones(shape=(alt + alt % 4, anch + anch % 4), dtype=np.uint8)
-        insert_img_into_other(img_src=img, img_dest=aux, pixel_left_top_col=0,
+        insert_img_into_other(img_src=gray_img, img_dest=aux, pixel_left_top_col=0,
                               pixel_left_top_row=0, substitute=True)
     # se queda igual que la original
     else:
-        aux = np.copy(img)
+        aux = np.copy(gray_img)
 
     return aux
 
@@ -638,14 +639,14 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
     # Pasamos a pintar los puntos seleccionados en la imagen original
     # colocando un círculo de color rojo sobre esta, con radio proporcional
     # a la escala en la que se ha obtenido este punto
-    circle_radius = [10, 3, 1]
+    circle_radius = [30, 15, 5]
     it = 0
-    aux2 = np.copy(aux)
-    for coordinates in coordinates_for_circles:
-        for i in range(len(coordinates[0])):
-            cv2.circle(img = aux, center = (coordinates[0][i],coordinates[1][i]),
-                       radius = circle_radius[it], color=0)
-        it += 1
+    aux2 = np.copy(img)
+    # for coordinates in coordinates_for_circles:
+    #     for i in range(len(coordinates[0])):
+    #         cv2.circle(img = aux, center = (coordinates[0][i],coordinates[1][i]),
+    #                    radius = circle_radius[it], color=0)
+    #     it += 1
 
     #######################################
     # Apartado b, refinar las coordenadas
@@ -666,62 +667,95 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
     # Apartado c, detectar orientacion
     ####################################
     angles = []
+    refined_points[0] = np.delete(refined_points[0],
+                                  np.where(refined_points[0][:, 0] > alt), 0)
     for scale in range(3):
         dx_img, dy_img = get_derivates_of(img=pyramide[scale], sigma=4.5)
         # Eliminamos los posibles puntos que se puedan pasar
         # del tamaño de la imagen
-        refined_points[scale] = np.delete(refined_points[scale],
-                                          np.where(refined_points[scale][:, 0] > alt), 0)
         # Obtenemos los indices para poder
         indices = np.array(refined_points[scale].T, dtype=int)
-        angles.append((np.arctan2(dy_img[indices[0],indices[1]], dx_img[indices[0],indices[1]])))
+        angles.append((np.arctan2(dx_img[indices[0],indices[1]], dy_img[indices[0],indices[1]])))
         # show_img(aux, 'antes')
 
     sin = np.sin
     cos = np.cos
-    it = 0
-    escala = 1
-    for coordinates in refined_points:
-        angle_it = 0
-        for point in coordinates:
-            point1 = int(point[1] * escala)
-            point2 = int(point[0] * escala)
-            cv2.circle(img=aux2, center=(point1, point2),
-                       radius=circle_radius[it], color=0)
-
-            cv2.line(img=aux2, pt1=(point1, point2),
-                     pt2=(int(point1+sin(angles[it][angle_it])*circle_radius[it]),
-                          int(point2+cos(angles[it][angle_it])*circle_radius[it])),
-                     color=(0))
-        it += 1
-        escala *= 2
+    radio = [20, 10, 5]
+    colors = [(175, 0, 0), (0, 175, 0), (0, 0, 175)]
+    size=1
+    for escala in range(3):
+        for i in range(50):
+            punto = refined_points[escala][i].astype(np.int) * size
+            # punto = [floor(punto[0]), floor(punto[1])]
+            angle = angles[escala][i] * np.pi
+            cv2.circle(img=aux2, center=(punto[1], punto[0]),
+                       radius=radio[escala], color=colors[escala],
+                       thickness=1)
+            cv2.line(img=aux2, pt1=(punto[1], punto[0]),
+                     pt2=(punto[1] + floor(cos(angle) * radio[escala]),
+                          punto[0] + floor(sin(angle) * radio[escala])),
+                     color=colors[escala])
+        size*=2
 
     show_img(aux2, 'despues')
 
-# ######################################################################
-def descriptor_matcher(img1, img2, thredshold):
+######################################################################
+def AKAZE_descriptor_matcher(img1, img2):
+    # AKAZE Version
     detector = cv2.AKAZE_create()
-    # detector = cv2.AKAZE_create(descriptor_type=cv2.AKAZE_DESCRIPTOR_KAZE,
-    #                  descriptor_channels=n_channels,threshold=thredshold)
+    # Obtenemos las imágenes en blanco y negro
+    img1_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+    img2_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+
     # detectamos y computamos los keypoints y los descriptores
-    # los almacenamos en una tupla
-    # KP_Dr = []
+    # los almacenamos. Estos descriptres serán descriptores SIFT
 
-    keypoints1, descriptors1 = detector.detectAndCompute(img1, None)
-    keypoints2, descriptors2 = detector.detectAndCompute(img2, None)
+    keypoints1, descriptors1 = detector.detectAndCompute(image=img1_gray, mask=None)
+    keypoints2, descriptors2 = detector.detectAndCompute(image=img2_gray, mask=None)
+
+    bf = cv2.BFMatcher(cv2.NORM_L2SQR, crossCheck=True)
+    matches = bf.knnMatch(descriptors1,descriptors2, k=1)
+
+    # # Apply ratio test
+    good = []
+    for m, n in matches:
+        if m.distance < 0.9 * n.distance:
+            good.append([m])
+
+    im3 = cv2.drawMatchesKnn(img1, keypoints1, img2, keypoints2, good, None, flags=2)
+    cv2.imshow("AKAZE matching", im3)
+    cv2.waitKey(0)
+    #
+
+######################################################################
+def KAZE_descriptor_matcher(img1, img2):
+    # Pasamos las imágenes a escala de grises
+    img1_gray = cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY)
+    img2_gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
+
+    kaze = cv2.KAZE_create()
+    kp_kaze_img1 = kaze.detect(img1_gray, None)
+    kp_kaze_img1, des_kaze_img1 = kaze.compute(img1_gray, kp_kaze_img1)
+    kp_kaze_img2 = kaze.detect(img2_gray, None)
+    kp_kaze_img2, des_kaze_img2 = kaze.compute(img2_gray, kp_kaze_img2)
     bf = cv2.BFMatcher(cv2.NORM_HAMMING)
-    matches = bf.knnMatch(descriptors1,descriptors2, k=2)
-
+    print(des_kaze_img1.dtype)
+    img_kaze = cv2.drawKeypoints(img1_gray, kp_kaze_img1, None)
+    matches = bf.knnMatch(des_kaze_img1.astype(np.float32),
+                          des_kaze_img2.astype(np.float32), k=2)
+    # # KAZE Version
+    # detector = cv2.AKAZE_create()
+    # # detectamos y computamos los keypoints y los descriptores
+    # # los almacenamos en una tupla
+    # keypoints1, descriptors1 = detector.detectAndCompute(img1, None)
+    # keypoints2, descriptors2 = detector.detectAndCompute(img2, None)
+    #
     # Apply ratio test
     good = []
     for m, n in matches:
         if m.distance < 0.9 * n.distance:
             good.append([m])
 
-    im3 = cv2.drawMatchesKnn(im1, keypoints1, im2, keypoints2, good[1:20], None, flags=2)
-    cv2.imshow("AKAZE matching", im3)
+    # im3 = cv2.drawMatchesKnn(img1, kp_kaze_img1, img2, kp_kaze_img2, good[1:20], None, flags=2)
+    cv2.imshow("KAZE matching", img_kaze)
     cv2.waitKey(0)
-            # KP_Dr.append(KP_Dr)
-
-
-
