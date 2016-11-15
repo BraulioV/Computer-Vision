@@ -528,8 +528,8 @@ def get_local_maximun(imgs, index_mask, mask_size):
 
 def prepare_img_to_harris_points(img):
     # Extraemos las dimensiones de la imagen, para que,
-    # en caso de que sean de tamaño impar, añadirle una fila
-    # o columna según corresponda, para que, al reducir,
+    # en caso de que sean de tamaño impar, añadirle las filas
+    # o columnas que correspondan, para que, al reducir,
     # podamos recuperar fácilmente las coordenadas de los puntos
     # harris.
     alt, anch = img.shape[:2]
