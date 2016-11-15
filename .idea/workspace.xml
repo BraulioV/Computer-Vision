@@ -5,7 +5,7 @@
   </component>
   <component name="BookmarkManager">
     <bookmark url="file://$PROJECT_DIR$/Practica1/functions.py" line="337" />
-    <bookmark url="file://$PROJECT_DIR$/Practica2/functions.py" line="751" />
+    <bookmark url="file://$PROJECT_DIR$/Practica2/functions.py" line="755" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="590ea915-2e7d-4349-ba73-7b2618a33e7a" name="Default" comment="">
@@ -38,8 +38,8 @@
       <file leaf-file-name="functions.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Practica2/functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="164">
-              <caret line="474" column="0" selection-start-line="474" selection-start-column="0" selection-end-line="735" selection-end-column="33" />
+            <state relative-caret-position="-736">
+              <caret line="693" column="17" selection-start-line="693" selection-start-column="17" selection-end-line="693" selection-end-column="17" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -675,7 +675,14 @@
       <option name="project" value="LOCAL" />
       <updated>1479229930764</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="ejercicio 1 terminado y modularizado">
+      <created>1479238239718</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1479238239718</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -760,7 +767,8 @@
     <MESSAGE value="ya no explota" />
     <MESSAGE value="ya está la orientación y empezando la parte de akaze" />
     <MESSAGE value="arreglada la orientación, empezando el segundo ejercicio" />
-    <option name="LAST_COMMIT_MESSAGE" value="arreglada la orientación, empezando el segundo ejercicio" />
+    <MESSAGE value="ejercicio 1 terminado y modularizado" />
+    <option name="LAST_COMMIT_MESSAGE" value="ejercicio 1 terminado y modularizado" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1251,8 +1259,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Practica2/functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="474" column="0" selection-start-line="474" selection-start-column="0" selection-end-line="735" selection-end-column="33" />
+        <state relative-caret-position="-736">
+          <caret line="693" column="17" selection-start-line="693" selection-start-column="17" selection-end-line="693" selection-end-column="17" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>

@@ -689,7 +689,10 @@ def show_result(img, refined_points, angles):
 def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500,
                           show_selected_points = False,
                           show_best_points = True):
-
+    #######################################
+    # Apartado a: extrare lista potencial
+    # de puntos Harris
+    #######################################
     alt, anch = img.shape[:2]
     aux = prepare_img_to_harris_points(img)
     # obtenemos la pirámide gaussiana
@@ -730,8 +733,9 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500,
 
     # Obtenemos los ángulos de los gradientes
     angles =  detect_angles(pyramide, refined_points)
-    # y mostramos el resultado
-    show_result(img, refined_points, angles)
+    # y mostramos el resultado si procede
+    if show_best_points:
+        show_result(img, refined_points, angles)
 
     return refined_points, angles
 
