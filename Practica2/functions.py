@@ -1,4 +1,5 @@
 import math
+import random
 import cv2
 import numpy as np
 
@@ -579,30 +580,7 @@ def get_eigenVals_and_eigenVecs(pyramide, thresdhold, blockS, kSize):
 
     return eingen_vals_and_vecs, strong_values
 
-def get_best_points():
-    pass
-
-
-def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
-
-    alt, anch = img.shape[:2]
-    aux = prepare_img_to_harris_points(img)
-    # obtenemos la pirámide gaussiana
-    pyramide = generate_gaussian_pyramide(img_src=aux, subsample_factor=2, n_levels=3)
-
-    # Obtenemos los autovalores y autovectores, junto
-    # con los puntos que superan el umbral
-    eingen_vals_and_vecs, strong_values = \
-        get_eigenVals_and_eigenVecs(pyramide, thresdhold, blockS, kSize)
-
-    # pasamos a eliminar los no máximos
-    xy_points, harrisV = get_local_maximun(imgs=eingen_vals_and_vecs,
-                                           index_mask=strong_values,
-                                           mask_size=3)
-    # inicializamos una imagen binaria (0,255) para
-    # representar los máximos locales de la imagen
-    img_points = np.zeros(shape=img.shape,dtype=np.uint8)
-
+def get_best_points(img_points, xy_points, harrisV, n_points):
     # Pasamos a poner a 1 los puntos con máximos locales
     it = 0
     floor = math.floor
@@ -628,76 +606,134 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500):
 
         # Almacenamos los puntos en una lista para poder
         # dibujar los círculos
-        coordinates_for_circles.append([xy_points[it][1][index[0:floor(n_points * percentages[it])]]*escala,
-                                        xy_points[it][0][index[0:floor(n_points * percentages[it])]]*escala,])
+        coordinates_for_circles.append([xy_points[it][1][index[0:floor(n_points * percentages[it])]] * escala,
+                                        xy_points[it][0][index[0:floor(n_points * percentages[it])]] * escala, ])
         # coordinates_for_circles.append(coord_xy*escala)
         # y los ponemos a 1
         img_points[coord_xy] = 255
-        it+=1
-        escala*=2
+        it += 1
+        escala *= 2
 
+    return selected_points, coordinates_for_circles
+
+def show_binary_points_on_img(img, coordinates_for_circles):
     # Pasamos a pintar los puntos seleccionados en la imagen original
     # colocando un círculo de color rojo sobre esta, con radio proporcional
     # a la escala en la que se ha obtenido este punto
     circle_radius = [30, 15, 5]
     it = 0
-    aux2 = np.copy(img)
-    # for coordinates in coordinates_for_circles:
-    #     for i in range(len(coordinates[0])):
-    #         cv2.circle(img = aux, center = (coordinates[0][i],coordinates[1][i]),
-    #                    radius = circle_radius[it], color=0)
-    #     it += 1
+    aux = np.copy(img)
+    for coordinates in coordinates_for_circles:
+        for i in range(len(coordinates[0])):
+            cv2.circle(img = aux, center = (coordinates[0][i],coordinates[1][i]),
+                       radius = circle_radius[it], color=0)
+        it += 1
+    show_img(aux, "Imagen binaria")
 
-    #######################################
-    # Apartado b, refinar las coordenadas
-    #######################################
+def refine_points(pyramide, selected_points):
     refined_points = []
     it = 0
 
     for img in pyramide:
         float_esquinas = np.array(selected_points[it], dtype=np.float32).copy()
-        cv2.cornerSubPix(image=img.astype(np.float32), corners = float_esquinas,
-                         winSize = (5,5), zeroZone = (-1,-1),
-                         criteria = (cv2.TERM_CRITERIA_MAX_ITER | cv2.TERM_CRITERIA_COUNT, 10, 0.01))
-        it+=1
+        cv2.cornerSubPix(image=img.astype(np.float32), corners=float_esquinas,
+                         winSize=(5, 5), zeroZone=(-1, -1),
+                         criteria=(cv2.TERM_CRITERIA_MAX_ITER | cv2.TERM_CRITERIA_COUNT, 10, 0.01))
+        it += 1
         refined_points.append(float_esquinas)
 
+    return refined_points
 
-    ####################################
-    # Apartado c, detectar orientacion
-    ####################################
+
+def detect_angles(pyramide, refined_points):
+    # inicializamos la lista con los ángulos
     angles = []
-    refined_points[0] = np.delete(refined_points[0],
-                                  np.where(refined_points[0][:, 0] > alt), 0)
+    # y recorremos las tres escalas
     for scale in range(3):
         dx_img, dy_img = get_derivates_of(img=pyramide[scale], sigma=4.5)
-        # Eliminamos los posibles puntos que se puedan pasar
-        # del tamaño de la imagen
         # Obtenemos los indices para poder
         indices = np.array(refined_points[scale].T, dtype=int)
-        angles.append((np.arctan2(dx_img[indices[0],indices[1]], dy_img[indices[0],indices[1]])))
-        # show_img(aux, 'antes')
+        # Calculamos los ángulos de forma vectorizada, donde
+        # el ángulo es:
+        #           ang = atan( dy/dx )
+        angles.append((np.arctan2(dx_img[indices[0], indices[1]],
+                                  dy_img[indices[0], indices[1]])))
 
+    # Devolvemos los ángulos
+    return angles
+
+
+def show_result(img, refined_points, angles):
+    aux2 = np.copy(img)
+    floor = math.floor
     sin = np.sin
     cos = np.cos
     radio = [20, 10, 5]
     colors = [(175, 0, 0), (0, 175, 0), (0, 0, 175)]
-    size=1
-    for escala in range(3):
-        for i in range(50):
-            punto = refined_points[escala][i].astype(np.int) * size
-            # punto = [floor(punto[0]), floor(punto[1])]
-            angle = angles[escala][i] * np.pi
+    size = 1
+    for scale in range(3):
+        for i in random.sample(range(len(refined_points[scale])), 100):
+            punto = refined_points[scale][i].astype(np.int) * size
+            angle = angles[scale][i] * np.pi
             cv2.circle(img=aux2, center=(punto[1], punto[0]),
-                       radius=radio[escala], color=colors[escala],
+                       radius=radio[scale], color=colors[scale],
                        thickness=1)
-            cv2.line(img=aux2, pt1=(punto[1], punto[0]),
-                     pt2=(punto[1] + floor(cos(angle) * radio[escala]),
-                          punto[0] + floor(sin(angle) * radio[escala])),
-                     color=colors[escala])
-        size*=2
+            cv2.arrowedLine(img=aux2, pt1=(punto[1], punto[0]),
+                            pt2=(punto[1] + floor(cos(angle) * radio[scale]),
+                                 punto[0] + floor(sin(angle) * radio[scale])),
+                            color=colors[scale])
+        size *= 2
 
-    show_img(aux2, 'despues')
+    show_img(aux2, 'Puntos y ángulos')
+
+def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500,
+                          show_selected_points = False,
+                          show_best_points = True):
+
+    alt, anch = img.shape[:2]
+    aux = prepare_img_to_harris_points(img)
+    # obtenemos la pirámide gaussiana
+    pyramide = generate_gaussian_pyramide(img_src=aux, subsample_factor=2, n_levels=3)
+
+    # Obtenemos los autovalores y autovectores, junto
+    # con los puntos que superan el umbral
+    eingen_vals_and_vecs, strong_values = \
+        get_eigenVals_and_eigenVecs(pyramide, thresdhold, blockS, kSize)
+
+    # pasamos a eliminar los no máximos
+    xy_points, harrisV = get_local_maximun(imgs=eingen_vals_and_vecs,
+                                           index_mask=strong_values,
+                                           mask_size=3)
+    # inicializamos una imagen binaria (0,255) para
+    # representar los máximos locales de la imagen
+    img_points = np.zeros(shape=img.shape,dtype=np.uint8)
+
+    selected_points, coordinates_for_circles = get_best_points(img_points, xy_points, harrisV, n_points)
+
+    if show_selected_points:
+        show_binary_points_on_img(img_points, coordinates_for_circles)
+
+    #######################################
+    # Apartado b, refinar las coordenadas
+    #######################################
+    refined_points = refine_points(pyramide, selected_points)
+
+    ####################################
+    # Apartado c, detectar orientacion
+    ####################################
+    # Eliminamos aquellos puntos que puedan haberse excedido del
+    # tamaño de la imagen
+    refined_points[0] = np.delete(refined_points[0],
+                                  np.where(refined_points[0][:, 0] > alt), 0)
+    refined_points[0] = np.delete(refined_points[0],
+                                  np.where(refined_points[0][0, :] > anch), 0)
+
+    # Obtenemos los ángulos de los gradientes
+    angles =  detect_angles(pyramide, refined_points)
+    # y mostramos el resultado
+    show_result(img, refined_points, angles)
+
+    return refined_points, angles
 
 ######################################################################
 def AKAZE_descriptor_matcher(img1, img2):
