@@ -610,9 +610,11 @@ def get_best_points(img_points, xy_points, harrisV, n_points):
                                         xy_points[it][0][index[0:floor(n_points * percentages[it])]] * escala, ])
         # coordinates_for_circles.append(coord_xy*escala)
         # y los ponemos a 1
-        img_points[coord_xy] = 255
+        img_points[coordinates_for_circles[-1][::-1]] = 255
         it += 1
         escala *= 2
+
+    show_img(img_points, "Primeros puntos seleccionados")
 
     return selected_points, coordinates_for_circles
 
@@ -628,7 +630,7 @@ def show_binary_points_on_img(img, coordinates_for_circles):
             cv2.circle(img = aux, center = (coordinates[0][i],coordinates[1][i]),
                        radius = circle_radius[it], color=0)
         it += 1
-    show_img(aux, "Imagen binaria")
+    show_img(aux, "Mejores puntos seleccionados")
 
 def refine_points(pyramide, selected_points):
     refined_points = []
@@ -674,7 +676,7 @@ def show_result(img, refined_points, angles):
     for scale in range(3):
         for i in random.sample(range(len(refined_points[scale])), 100):
             punto = refined_points[scale][i].astype(np.int) * size
-            angle = angles[scale][i] * np.pi
+            angle = angles[scale][i] * 180/np.pi
             cv2.circle(img=aux2, center=(punto[1], punto[0]),
                        radius=radio[scale], color=colors[scale],
                        thickness=1)
@@ -687,7 +689,7 @@ def show_result(img, refined_points, angles):
     show_img(aux2, 'Puntos y ángulos')
 
 def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500,
-                          show_selected_points = False,
+                          show_selected_points = True,
                           show_best_points = True):
     #######################################
     # Apartado a: extrare lista potencial
@@ -754,7 +756,9 @@ def AKAZE_descriptor_matcher(img1, img2):
     keypoints2, descriptors2 = detector.detectAndCompute(image=img2_gray, mask=None)
 
     bf = cv2.BFMatcher(cv2.NORM_L2SQR, crossCheck=True)
-    matches = bf.knnMatch(descriptors1,descriptors2, k=1)
+    matches = bf.knnMatch(descriptors1,descriptors2, k=2)
+
+    print(matches)
 
     # # Apply ratio test
     good = []
@@ -765,37 +769,36 @@ def AKAZE_descriptor_matcher(img1, img2):
     im3 = cv2.drawMatchesKnn(img1, keypoints1, img2, keypoints2, good, None, flags=2)
     cv2.imshow("AKAZE matching", im3)
     cv2.waitKey(0)
-    #
-
-######################################################################
-def KAZE_descriptor_matcher(img1, img2):
-    # Pasamos las imágenes a escala de grises
-    img1_gray = cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY)
-    img2_gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
-
-    kaze = cv2.KAZE_create()
-    kp_kaze_img1 = kaze.detect(img1_gray, None)
-    kp_kaze_img1, des_kaze_img1 = kaze.compute(img1_gray, kp_kaze_img1)
-    kp_kaze_img2 = kaze.detect(img2_gray, None)
-    kp_kaze_img2, des_kaze_img2 = kaze.compute(img2_gray, kp_kaze_img2)
-    bf = cv2.BFMatcher(cv2.NORM_HAMMING)
-    print(des_kaze_img1.dtype)
-    img_kaze = cv2.drawKeypoints(img1_gray, kp_kaze_img1, None)
-    matches = bf.knnMatch(des_kaze_img1.astype(np.float32),
-                          des_kaze_img2.astype(np.float32), k=2)
-    # # KAZE Version
-    # detector = cv2.AKAZE_create()
-    # # detectamos y computamos los keypoints y los descriptores
-    # # los almacenamos en una tupla
-    # keypoints1, descriptors1 = detector.detectAndCompute(img1, None)
-    # keypoints2, descriptors2 = detector.detectAndCompute(img2, None)
-    #
-    # Apply ratio test
-    good = []
-    for m, n in matches:
-        if m.distance < 0.9 * n.distance:
-            good.append([m])
-
-    # im3 = cv2.drawMatchesKnn(img1, kp_kaze_img1, img2, kp_kaze_img2, good[1:20], None, flags=2)
-    cv2.imshow("KAZE matching", img_kaze)
-    cv2.waitKey(0)
+#
+# ######################################################################
+# def KAZE_descriptor_matcher(img1, img2):
+#     # Pasamos las imágenes a escala de grises
+#     img1_gray = cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY)
+#     img2_gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
+#
+#     kaze = cv2.KAZE_create()
+#     kp_kaze_img1 = kaze.detect(img1_gray, None)
+#     kp_kaze_img1, des_kaze_img1 = kaze.compute(img1_gray, kp_kaze_img1)
+#     kp_kaze_img2 = kaze.detect(img2_gray, None)
+#     kp_kaze_img2, des_kaze_img2 = kaze.compute(img2_gray, kp_kaze_img2)
+#     bf = cv2.BFMatcher(cv2.NORM_HAMMING)
+#     print(des_kaze_img1.dtype)
+#     img_kaze = cv2.drawKeypoints(img1_gray, kp_kaze_img1, None)
+#     matches = bf.knnMatch(des_kaze_img1.astype(np.float32),
+#                           des_kaze_img2.astype(np.float32), k=2)
+#     # # KAZE Version
+#     # detector = cv2.AKAZE_create()
+#     # # detectamos y computamos los keypoints y los descriptores
+#     # # los almacenamos en una tupla
+#     # keypoints1, descriptors1 = detector.detectAndCompute(img1, None)
+#     # keypoints2, descriptors2 = detector.detectAndCompute(img2, None)
+#     #
+#     # Apply ratio test
+#     good = []
+#     for m, n in matches:
+#         if m.distance < 0.9 * n.distance:
+#             good.append([m])
+#
+#     # im3 = cv2.drawMatchesKnn(img1, kp_kaze_img1, img2, kp_kaze_img2, good[1:20], None, flags=2)
+#     cv2.imshow("KAZE matching", img_kaze)
+#     cv2.waitKey(0)
