@@ -9,9 +9,6 @@
   <component name="ChangeListManager">
     <list default="true" id="590ea915-2e7d-4349-ba73-7b2618a33e7a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Practica2/Detección_de_puntos_relevantes_y_Construcción_de_panoramas.ipynb" afterPath="$PROJECT_DIR$/Practica2/Detección_de_puntos_relevantes_y_Construcción_de_panoramas.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Practica2/cornerpoints.py" afterPath="$PROJECT_DIR$/Practica2/cornerpoints.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Practica2/main.py" afterPath="$PROJECT_DIR$/Practica2/main.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -54,7 +51,7 @@
             <entry file="file://$PROJECT_DIR$/Practica2/cornerpoints.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="141">
-                  <caret line="332" column="4" lean-forward="false" selection-start-line="332" selection-start-column="4" selection-end-line="332" selection-end-column="4" />
+                  <caret line="332" column="0" lean-forward="false" selection-start-line="332" selection-start-column="0" selection-end-line="332" selection-end-column="0" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
                   </folding>
@@ -733,7 +730,14 @@
       <option name="project" value="LOCAL" />
       <updated>1479288991699</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="empezando el ejercicio 3">
+      <created>1479299239694</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1479299239695</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -797,7 +801,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Terminada la función *make_hybrid_image* y realizada la función *subsample_image*. Queda por hacer el collage para mostrar las fotos" />
     <MESSAGE value="cambiada la función de insertar en otra imagen, para permitir añadir o sustituir el valor, comentarios en las funciones, limpieza de prints, y añadida la función para crear un canvas piramidal" />
     <MESSAGE value="Función para generar un canvas continuo" />
     <MESSAGE value="Jupyter actualizado" />
@@ -822,7 +825,8 @@
     <MESSAGE value="arreglado un comentario y una opcion no usada" />
     <MESSAGE value="arreglado el ángulo del descriptor, y el jupyter" />
     <MESSAGE value="arreglado algunos errores del ejercicio1, y terminado el ejercicio 2 para kaze y akaze" />
-    <option name="LAST_COMMIT_MESSAGE" value="arreglado algunos errores del ejercicio1, y terminado el ejercicio 2 para kaze y akaze" />
+    <MESSAGE value="empezando el ejercicio 3" />
+    <option name="LAST_COMMIT_MESSAGE" value="empezando el ejercicio 3" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1318,7 +1322,7 @@
     <entry file="file://$PROJECT_DIR$/Practica2/cornerpoints.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="141">
-          <caret line="332" column="4" lean-forward="false" selection-start-line="332" selection-start-column="4" selection-end-line="332" selection-end-column="4" />
+          <caret line="332" column="0" lean-forward="false" selection-start-line="332" selection-start-column="0" selection-end-line="332" selection-end-column="0" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
