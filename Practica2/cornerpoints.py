@@ -203,11 +203,12 @@ def show_result(img, refined_points, angles):
     floor = math.floor
     sin = np.sin
     cos = np.cos
-    radio = [20, 10, 5]
+    radio = [5, 10, 20]
     colors = [(175, 0, 0), (0, 175, 0), (0, 0, 175)]
     size = 1
     for scale in range(3):
-        for i in random.sample(range(len(refined_points[scale])), 100):
+        # for i in random.sample(range(len(refined_points[scale])), 100):
+        for i in range(len(refined_points[scale])):
             punto = refined_points[scale][i].astype(np.int) * size
             angle = angles[scale][i] * 180/np.pi
             cv2.circle(img=aux2, center=(punto[1], punto[0]),
@@ -275,7 +276,8 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500,
     return refined_points, angles
 
 ######################################################################
-def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False):
+def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
+                             show_matches = True):
     # KAZE detector
     if not use_KAZE_detector:
         detector = cv2.AKAZE_create()
@@ -294,10 +296,63 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False):
     # Detectamos las correspondencias o matches
     matches = bf.match(descriptors1,descriptors2)
     # Y las ordenamos según la distancia
-    matches = sorted(matches, key=lambda x: x.distance)
+    # matches = sorted(matches, key=lambda x: x.distance)
+    if show_matches:
+        match_img = cv2.drawMatches(img1 = img1, keypoints1=keypoints1,
+                                    img2 = img2, keypoints2=keypoints2,
+                                    matches1to2=matches[:50], outImg=None, flags=4)
 
-    match_img = cv2.drawMatches(img1 = img1, keypoints1=keypoints1,
-                                img2 = img2, keypoints2=keypoints2,
-                                matches1to2=matches[:50], outImg=None, flags=4)
+        show_img(match_img, "Correspondencias")
 
-    show_img(match_img, "Correspondencias")
+    return (keypoints1, descriptors1), (keypoints2, descriptors2), matches
+
+
+########################################################################
+# Ejercicio 3
+########################################################################
+
+def create_mosaico(imgs_list):
+    length, height = 0, 0
+    max_of = max
+    for i in imgs_list:
+        alt, anch = i.shape[:2]
+        length += anch
+        height = max_of(height, alt)
+
+        if len(i.shape) == 3:
+            color_imgs = True
+
+    mosaico = np.zeros(shape=(length, height), dtype=np.uint8)
+
+
+
+def create_two_mosaico(img1, img2, error=5):
+    kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2,show_matches=False)
+    k, j = cv2.findHomography(srcPoints=kp_dsp1[0],dstPoints=kp_dsp2[0], method=cv2.RANSAC,
+                              ransacReprojThreshold=error, mask = matches)
+
+    # # Generamos un canvas vacío lo suficientemente grande
+    # # como para poder introducir las dos imágenes.
+    #
+    # # Dependiendo de si la imagen es en color o no,
+    # # generamos el mosaico con un canal o tres
+    # if color_imgs:
+    #     mosaico = np.zeros(shape=(height, length,3), dtype=np.uint8)
+    # else:
+    #     mosaico = np.zeros(shape=(height, length), dtype=np.uint8)
+    #
+    # # Insertamos la primera imagen en el mosaico
+    # insert_img_into_other(img_src=imgs_list[0], pixel_left_top_row = 0,
+    #                       pixel_left_top_col = 0, img_dest=mosaico,
+    #                       subtitute = True)
+    #
+    #
+    #
+
+
+def find_homography_on_mosaico():
+    pass
+
+# Lo primero es coger dos imágenes, y sacar sus keypoints
+# y las correspondencias
+# Después
