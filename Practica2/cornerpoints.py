@@ -149,7 +149,7 @@ def get_best_points(img_points, xy_points, harrisV, n_points):
 
     show_img(img_points, "Primeros puntos seleccionados")
 
-    return selected_points, coordinates_for_circles
+    return selected_points
 
 def show_binary_points_on_img(img, coordinates_for_circles):
     # Pasamos a pintar los puntos seleccionados en la imagen original
@@ -246,11 +246,12 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500,
     # inicializamos una imagen binaria (0,255) para
     # representar los máximos locales de la imagen
     img_points = np.zeros(shape=img.shape,dtype=np.uint8)
+    # Obtenemos los mejores puntos para cada uno de
+    # los niveles
+    selected_points = get_best_points(img_points, xy_points, harrisV, n_points)
 
-    selected_points, coordinates_for_circles = get_best_points(img_points, xy_points, harrisV, n_points)
-
-    if show_selected_points:
-        show_binary_points_on_img(img_points, coordinates_for_circles)
+    # if show_selected_points:
+    #     show_binary_points_on_img(img_points, coordinates_for_circles)
 
     #######################################
     # Apartado b, refinar las coordenadas
@@ -296,7 +297,7 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
     # Detectamos las correspondencias o matches
     matches = bf.match(descriptors1,descriptors2)
     # Y las ordenamos según la distancia
-    # matches = sorted(matches, key=lambda x: x.distance)
+    matches = sorted(matches, key=lambda x: x.distance)
     if show_matches:
         match_img = cv2.drawMatches(img1 = img1, keypoints1=keypoints1,
                                     img2 = img2, keypoints2=keypoints2,
