@@ -18,7 +18,6 @@ def local_maximun(environment):
 def get_local_maximun(imgs, index_mask, mask_size):
     # obtenemos los índices de los puntos que han sobrepasado
     # el umbral mínimo
-    escala = 1
     img = 0
     xy_bests_points = []
     harrisV_bests_points = []
@@ -37,6 +36,10 @@ def get_local_maximun(imgs, index_mask, mask_size):
         maxHs = []
         for k in range(len(rows)):
             # Obtenemos las cuatro esquinas de la región a analizar
+            # La región la declaramos con las misma coordenadas que
+            # obtuvimos de la imagen original. Esto se debe a que si
+            # ensanchamos la imagen, estas coordenadas estarán
+            # desplazadas, floor(-n/2) píxeles en el eje X y en el eje Y
             left = rows[k]
             right = (rows[k]+mask_size)
             top = cols[k]
@@ -53,7 +56,6 @@ def get_local_maximun(imgs, index_mask, mask_size):
         # xy_bests_points.append(maxls_xy)
         harrisV_bests_points.append(maxHs)
         img += 1
-        escala *= 2
 
     return xy_bests_points, harrisV_bests_points
 
@@ -120,10 +122,9 @@ def get_best_points(img_points, xy_points, harrisV, n_points):
     # Esto representa el porcentaje de puntos que tomaremos de cada escala
     # tomando del primer nivel el 70%, del segundo el 20% y del último el 10%
     percentages = [.7, .2, .1]
-    # Empezamos a recorrer los puntos que hemos extraído como máximos locales
-    coordinates_for_circles = []
     escala = 1
     selected_points = []
+    # Empezamos a recorrer los puntos que hemos extraído como máximos locales
     for points in harrisV:
         # ordenamos los puntos. Como argsort los da ordenados
         # de menor a mayor, invertimos el vector para obtenerlos
@@ -139,11 +140,11 @@ def get_best_points(img_points, xy_points, harrisV, n_points):
 
         # Almacenamos los puntos en una lista para poder
         # dibujar los círculos
-        coordinates_for_circles.append([xy_points[it][1][index[0:floor(n_points * percentages[it])]] * escala,
-                                        xy_points[it][0][index[0:floor(n_points * percentages[it])]] * escala, ])
+        coordinates_for_circles = [xy_points[it][1][index[0:floor(n_points * percentages[it])]] * escala,
+                                        xy_points[it][0][index[0:floor(n_points * percentages[it])]] * escala,]
         # coordinates_for_circles.append(coord_xy*escala)
         # y los ponemos a 1
-        img_points[coordinates_for_circles[-1][::-1]] = 255
+        img_points[coordinates_for_circles[::-1]] = 255
         it += 1
         escala *= 2
 
@@ -326,7 +327,6 @@ def create_mosaico(imgs_list):
     mosaico = np.zeros(shape=(length, height), dtype=np.uint8)
 
 
-
 def create_two_mosaico(img1, img2, error=5.0):
     kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2,show_matches=False)
 
@@ -338,11 +338,3 @@ def create_two_mosaico(img1, img2, error=5.0):
     H, boolean = cv2.findHomography(srcPoints=src_points,dstPoints=dest_points, method=cv2.RANSAC,
                               ransacReprojThreshold=error)
 
-
-
-def find_homography_on_mosaico():
-    pass
-
-# Lo primero es coger dos imágenes, y sacar sus keypoints
-# y las correspondencias
-# Después

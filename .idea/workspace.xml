@@ -24,7 +24,7 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Computer-Vision$functions__1_.coverage" NAME="functions (1) Coverage Results" MODIFIED="1478087209825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
     <SUITE FILE_PATH="coverage/Computer-Vision$main.coverage" NAME="main Coverage Results" MODIFIED="1477307715097" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica1" />
-    <SUITE FILE_PATH="coverage/Computer-Vision$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1479408681937" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
+    <SUITE FILE_PATH="coverage/Computer-Vision$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1479411163704" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
     <SUITE FILE_PATH="coverage/Computer-Vision$functions.coverage" NAME="functions Coverage Results" MODIFIED="1476455446989" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica1" />
   </component>
   <component name="CreatePatchCommitExecutor">
@@ -51,8 +51,8 @@
       <file leaf-file-name="cornerpoints.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Practica2/cornerpoints.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="399">
-              <caret line="340" column="0" selection-start-line="340" selection-start-column="0" selection-end-line="340" selection-end-column="0" />
+            <state relative-caret-position="-900">
+              <caret line="180" column="25" selection-start-line="180" selection-start-column="25" selection-end-line="180" selection-end-column="25" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -63,8 +63,8 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Practica2/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+            <state relative-caret-position="90">
+              <caret line="6" column="69" selection-start-line="6" selection-start-column="69" selection-end-line="7" selection-end-column="60" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -711,7 +711,14 @@
       <option name="project" value="LOCAL" />
       <updated>1479245070602</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Ya funciona el findHomography">
+      <created>1479408820914</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1479408820914</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -799,17 +806,11 @@
     <MESSAGE value="ejercicio 1 terminado y modularizado" />
     <MESSAGE value="arreglado un comentario y una opcion no usada" />
     <MESSAGE value="arreglado el ángulo del descriptor, y el jupyter" />
-    <option name="LAST_COMMIT_MESSAGE" value="arreglado el ángulo del descriptor, y el jupyter" />
+    <MESSAGE value="Ya funciona el findHomography" />
+    <option name="LAST_COMMIT_MESSAGE" value="Ya funciona el findHomography" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Practica2/cornerpoints.py</url>
-          <line>332</line>
-          <option name="timeStamp" value="58" />
-        </line-breakpoint>
-      </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
@@ -820,7 +821,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="59" />
+      <option name="time" value="63" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1279,8 +1280,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Practica2/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+        <state relative-caret-position="90">
+          <caret line="6" column="69" selection-start-line="6" selection-start-column="69" selection-end-line="7" selection-end-column="60" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
@@ -1289,8 +1290,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Practica2/cornerpoints.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="340" column="0" selection-start-line="340" selection-start-column="0" selection-end-line="340" selection-end-column="0" />
+        <state relative-caret-position="-900">
+          <caret line="180" column="25" selection-start-line="180" selection-start-column="25" selection-end-line="180" selection-end-column="25" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
