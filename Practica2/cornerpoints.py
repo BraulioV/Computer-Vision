@@ -297,7 +297,7 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
     # Detectamos las correspondencias o matches
     matches = bf.match(descriptors1,descriptors2)
     # Y las ordenamos según la distancia
-    matches = sorted(matches, key=lambda x: x.distance)
+    # matches = sorted(matches, key=lambda x: x.distance)
     if show_matches:
         match_img = cv2.drawMatches(img1 = img1, keypoints1=keypoints1,
                                     img2 = img2, keypoints2=keypoints2,
@@ -305,7 +305,7 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
 
         show_img(match_img, "Correspondencias")
 
-    return (keypoints1, descriptors1), (keypoints2, descriptors2), matches
+    return [keypoints1, descriptors1], [keypoints2, descriptors2], matches
 
 
 ########################################################################
@@ -327,28 +327,17 @@ def create_mosaico(imgs_list):
 
 
 
-def create_two_mosaico(img1, img2, error=5):
+def create_two_mosaico(img1, img2, error=5.0):
     kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2,show_matches=False)
-    k, j = cv2.findHomography(srcPoints=kp_dsp1[0],dstPoints=kp_dsp2[0], method=cv2.RANSAC,
-                              ransacReprojThreshold=error, mask = matches)
 
-    # # Generamos un canvas vacío lo suficientemente grande
-    # # como para poder introducir las dos imágenes.
-    #
-    # # Dependiendo de si la imagen es en color o no,
-    # # generamos el mosaico con un canal o tres
-    # if color_imgs:
-    #     mosaico = np.zeros(shape=(height, length,3), dtype=np.uint8)
-    # else:
-    #     mosaico = np.zeros(shape=(height, length), dtype=np.uint8)
-    #
-    # # Insertamos la primera imagen en el mosaico
-    # insert_img_into_other(img_src=imgs_list[0], pixel_left_top_row = 0,
-    #                       pixel_left_top_col = 0, img_dest=mosaico,
-    #                       subtitute = True)
-    #
-    #
-    #
+    src_points = np.float32([kp_dsp2[0][point.trainIdx].pt for point in matches])
+    dest_points = np.float32([ kp_dsp1[0][point.queryIdx].pt for point in matches])
+
+
+
+    H, boolean = cv2.findHomography(srcPoints=src_points,dstPoints=dest_points, method=cv2.RANSAC,
+                              ransacReprojThreshold=error)
+
 
 
 def find_homography_on_mosaico():
