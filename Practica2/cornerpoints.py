@@ -130,9 +130,10 @@ def get_best_points(img_points, xy_points, harrisV, n_points):
         # de menor a mayor, invertimos el vector para obtenerlos
         # de mayor a menor.
         index = np.argsort(points)[::-1]
+        points_to_get = floor(n_points * percentages[it])
         # tomamos las coordenadas del % de puntos mejores
-        coord_xy = [xy_points[it][0][index[0:floor(n_points * percentages[it])]],
-                    xy_points[it][1][index[0:floor(n_points * percentages[it])]]]
+        coord_xy = [xy_points[it][0][index[0:points_to_get]],
+                    xy_points[it][1][index[0:points_to_get]]]
 
         # Almacenamos los mejores puntos de cada escala
         # ya ordenados, y sin
@@ -140,11 +141,11 @@ def get_best_points(img_points, xy_points, harrisV, n_points):
 
         # Almacenamos los puntos en una lista para poder
         # dibujar los círculos
-        coordinates_for_circles = [xy_points[it][1][index[0:floor(n_points * percentages[it])]] * escala,
-                                        xy_points[it][0][index[0:floor(n_points * percentages[it])]] * escala,]
+        coordinates_for_circles = [xy_points[it][0][index[0:floor(n_points * percentages[it])]] * escala,
+                                   xy_points[it][1][index[0:floor(n_points * percentages[it])]] * escala,]
         # coordinates_for_circles.append(coord_xy*escala)
         # y los ponemos a 1
-        img_points[coordinates_for_circles[::-1]] = 255
+        img_points[coordinates_for_circles] = 255
         it += 1
         escala *= 2
 
@@ -152,19 +153,6 @@ def get_best_points(img_points, xy_points, harrisV, n_points):
 
     return selected_points
 
-def show_binary_points_on_img(img, coordinates_for_circles):
-    # Pasamos a pintar los puntos seleccionados en la imagen original
-    # colocando un círculo de color rojo sobre esta, con radio proporcional
-    # a la escala en la que se ha obtenido este punto
-    circle_radius = [30, 15, 5]
-    it = 0
-    aux = np.copy(img)
-    for coordinates in coordinates_for_circles:
-        for i in range(len(coordinates[0])):
-            cv2.circle(img = aux, center = (coordinates[0][i],coordinates[1][i]),
-                       radius = circle_radius[it], color=0)
-        it += 1
-    show_img(aux, "Mejores puntos seleccionados")
 
 def refine_points(pyramide, selected_points):
     refined_points = []
@@ -193,13 +181,13 @@ def detect_angles(pyramide, refined_points):
         # el ángulo es:
         #           ang = atan( dy/dx )
         angles.append((np.arctan2(dy_img[indices[0], indices[1]],
-                                  dx_img[indices[0], indices[1]])))
+                                  dx_img[indices[0], indices[1]]))*180/np.pi)
 
     # Devolvemos los ángulos
     return angles
 
 
-def show_result(img, refined_points, angles):
+def show_result(img, refined_points, angles, thick):
     aux2 = np.copy(img)
     floor = math.floor
     sin = np.sin
@@ -208,24 +196,25 @@ def show_result(img, refined_points, angles):
     colors = [(175, 0, 0), (0, 175, 0), (0, 0, 175)]
     size = 1
     for scale in range(3):
-        # for i in random.sample(range(len(refined_points[scale])), 100):
-        for i in range(len(refined_points[scale])):
+        for i in random.sample(range(len(refined_points[scale])), 100):
+        # for i in range(len(refined_points[scale])):
             punto = refined_points[scale][i].astype(np.int) * size
-            angle = angles[scale][i] * 180/np.pi
+            angle = angles[scale][i]
             cv2.circle(img=aux2, center=(punto[1], punto[0]),
                        radius=radio[scale], color=colors[scale],
-                       thickness=1)
+                       thickness=thick)
             cv2.arrowedLine(img=aux2, pt1=(punto[1], punto[0]),
-                            pt2=(punto[1] + floor(cos(angle) * radio[scale]),
-                                 punto[0] + floor(sin(angle) * radio[scale])),
-                            color=colors[scale])
+                            pt2=(punto[1] + floor(sin(angle) * radio[scale]),
+                                 punto[0] + floor(cos(angle) * radio[scale])),
+                            color=colors[scale],thickness=thick)
         size *= 2
 
     show_img(aux2, 'Puntos y ángulos')
 
+
 def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500,
-                          show_selected_points = True,
-                          show_best_points = True):
+                          show_best_points = True,
+                          thick = 1):
     #######################################
     # Apartado a: extrare lista potencial
     # de puntos Harris
@@ -249,10 +238,8 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500,
     img_points = np.zeros(shape=img.shape,dtype=np.uint8)
     # Obtenemos los mejores puntos para cada uno de
     # los niveles
-    selected_points = get_best_points(img_points, xy_points, harrisV, n_points)
 
-    # if show_selected_points:
-    #     show_binary_points_on_img(img_points, coordinates_for_circles)
+    selected_points = get_best_points(img_points, xy_points, harrisV, n_points)
 
     #######################################
     # Apartado b, refinar las coordenadas
@@ -273,13 +260,15 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500,
     angles =  detect_angles(pyramide, refined_points)
     # y mostramos el resultado si procede
     if show_best_points:
-        show_result(img, refined_points, angles)
+        show_result(img, refined_points, angles, thick)
 
     return refined_points, angles
 
+
 ######################################################################
 def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
-                             show_matches = True):
+                             show_matches = True,
+                             sort_points_by_distance_parameter = False):
     # KAZE detector
     if not use_KAZE_detector:
         detector = cv2.AKAZE_create()
@@ -298,7 +287,9 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
     # Detectamos las correspondencias o matches
     matches = bf.match(descriptors1,descriptors2)
     # Y las ordenamos según la distancia
-    # matches = sorted(matches, key=lambda x: x.distance)
+    if sort_points_by_distance_parameter:
+        matches = sorted(matches, key=lambda x: x.distance)
+
     if show_matches:
         match_img = cv2.drawMatches(img1 = img1, keypoints1=keypoints1,
                                     img2 = img2, keypoints2=keypoints2,
@@ -314,27 +305,19 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
 ########################################################################
 
 def create_mosaico(imgs_list):
-    length, height = 0, 0
-    max_of = max
-    for i in imgs_list:
-        alt, anch = i.shape[:2]
-        length += anch
-        height = max_of(height, alt)
-
-        if len(i.shape) == 3:
-            color_imgs = True
-
-    mosaico = np.zeros(shape=(length, height), dtype=np.uint8)
-
+    pass
 
 def create_two_mosaico(img1, img2, error=5.0):
+    # Obtenemos los puntos clave y descriptores de cada imagen,
+    # junto con las correspondencias entre ambas imágenes.
     kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2,show_matches=False)
-
+    # Tras esto, obtenemos las coordenadas de los puntos
+    # claves de ambas imágenes.
     src_points = np.float32([kp_dsp2[0][point.trainIdx].pt for point in matches])
     dest_points = np.float32([ kp_dsp1[0][point.queryIdx].pt for point in matches])
 
-
-
+    # Obtenemos la primera homografía y la máscara booleana de puntos buenos
+    # que hemos obtenido, para después pasar a "entrenar" o "refinar".
     H, boolean = cv2.findHomography(srcPoints=src_points,dstPoints=dest_points, method=cv2.RANSAC,
                               ransacReprojThreshold=error)
 
