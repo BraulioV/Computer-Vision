@@ -267,6 +267,7 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500,
 
 ######################################################################
 def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
+                             points_mask = None,
                              show_matches = True,
                              sort_points_by_distance_parameter = False):
     # KAZE detector
@@ -274,14 +275,14 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
         detector = cv2.AKAZE_create()
     else:
         detector = cv2.KAZE_create()
-    # Obtenemos las imágenes en blanco y negro
+    # obtenemos las imágenes en blanco y negro
     img1_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     img2_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
 
     # detectamos y computamos los keypoints y los descriptores
     # los almacenamos. Estos descriptres serán descriptores SIFT
-    keypoints1, descriptors1 = detector.detectAndCompute(image=img1_gray, mask=None)
-    keypoints2, descriptors2 = detector.detectAndCompute(image=img2_gray, mask=None)
+    keypoints1, descriptors1 = detector.detectAndCompute(image=img1_gray, mask=points_mask)
+    keypoints2, descriptors2 = detector.detectAndCompute(image=img2_gray, mask=points_mask)
     # Creamos el BFmatcher (Brute Force) que usará validación cruzada
     bf = cv2.BFMatcher(normType=cv2.NORM_L2, crossCheck=True)
     # Detectamos las correspondencias o matches
@@ -307,17 +308,53 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
 def create_mosaico(imgs_list):
     pass
 
-def create_two_mosaico(img1, img2, error=5.0):
+def create_two_mosaico(img1, img2, error=1, max_iters = 150):
     # Obtenemos los puntos clave y descriptores de cada imagen,
     # junto con las correspondencias entre ambas imágenes.
     kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2,show_matches=False)
     # Tras esto, obtenemos las coordenadas de los puntos
     # claves de ambas imágenes.
-    src_points = np.float32([kp_dsp2[0][point.trainIdx].pt for point in matches])
-    dest_points = np.float32([ kp_dsp1[0][point.queryIdx].pt for point in matches])
-
+    src_points = np.float32([kp_dsp2[0][point.trainIdx].pt for point in matches]).reshape(-1,1,2)
+    dest_points = np.float32([kp_dsp1[0][point.queryIdx].pt for point in matches]).reshape(-1,1,2)
     # Obtenemos la primera homografía y la máscara booleana de puntos buenos
     # que hemos obtenido, para después pasar a "entrenar" o "refinar".
-    H, boolean = cv2.findHomography(srcPoints=src_points,dstPoints=dest_points, method=cv2.RANSAC,
-                              ransacReprojThreshold=error)
+    H, boolean_mask = cv2.findHomography(srcPoints=np.float32(src_points).reshape(-1,1,2),
+                                         dstPoints=np.float32(dest_points).reshape(-1,1,2),
+                                         method=cv2.RANSAC,
+                                         ransacReprojThreshold=error)
 
+    # Contamos el número de puntos que no apoyan la homografía H
+    not_supporting_points = len(boolean_mask[boolean_mask == 0])
+    n_iters = 0
+    # Almacenamos la mejor homografía
+    best_H = np.copy(H)
+    while n_iters < max_iters:
+        # Calculamos nuevas parejas de puntos
+        kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2,
+                                                             points_mask = boolean_mask,
+                                                             show_matches=False)
+        # Obtenemos sus puntos
+        src_points = np.float32([kp_dsp2[0][point.trainIdx].pt for point in matches]).reshape(-1,1,2)
+        dest_points = np.float32([ kp_dsp1[0][point.queryIdx].pt for point in matches]).reshape(-1,1,2)
+        
+        # Calculamos una nueva homografía
+        H, bools = cv2.findHomography(srcPoints=np.float32(src_points).reshape(-1,1,2),
+                                             dstPoints=np.float32(dest_points).reshape(-1,1,2),
+                                             method=cv2.RANSAC,
+                                             ransacReprojThreshold=error,
+                                             mask=boolean_mask)
+        n_iters+=1
+        if not_supporting_points < len(boolean_mask[boolean_mask == 0]):
+            not_supporting_points = len(boolean_mask[boolean_mask == 0])
+            best_H = np.copy(H)
+            print(not_supporting_points)
+
+    img_transformed = cv2.warpPerspective(src=img2, dst=img1, M=H, dsize=(img2.shape[1]*2, img2.shape[0]))
+    
+    show_img(img_transformed,"transformada")
+
+    canvas = np.zeros(shape=(img1.shape[0]+img2.shape[0]+50,img1.shape[1]+img2.shape[1]+50))
+
+    print(not_supporting_points)
+    print(H)
+    return best_H
