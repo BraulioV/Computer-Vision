@@ -269,7 +269,7 @@ def extract_harris_points(img, blockS, kSize, thresdhold, n_points = 1500,
 def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
                              points_mask = None,
                              show_matches = True,
-                             sort_points_by_distance_parameter = False):
+                             sort_points_by_distance_parameter = True):
     # KAZE detector
     if not use_KAZE_detector:
         detector = cv2.AKAZE_create()
@@ -284,7 +284,7 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
     keypoints1, descriptors1 = detector.detectAndCompute(image=img1_gray, mask=points_mask)
     keypoints2, descriptors2 = detector.detectAndCompute(image=img2_gray, mask=points_mask)
     # Creamos el BFmatcher (Brute Force) que usará validación cruzada
-    bf = cv2.BFMatcher(normType=cv2.NORM_L2, crossCheck=True)
+    bf = cv2.BFMatcher(normType=cv2.NORM_L1, crossCheck=True)
     # Detectamos las correspondencias o matches
     matches = bf.match(descriptors1,descriptors2)
     # Y las ordenamos según la distancia
@@ -305,28 +305,83 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
 # Ejercicio 3
 ########################################################################
 
-def create_mosaico(imgs_list):
-    pass
+def find_not_zero(img, axis):
+    if axis == 0:
+        i = img.shape[0] - 1
+        f = lambda index: np.sum(img[index,:]) != 0
+    else:
+        i = img.shape[1] - 1
+        f = lambda index: np.sum(img[:, index]) != 0
 
-def create_two_mosaico(img1, img2, error=1, max_iters = 75):
+    deleted = True
+    while deleted:
+        if f(i) != 0:
+            deleted = False
+        else:
+            i -= 1
+    deleted = True
+    j = 0
+    while deleted:
+        if f(j) != 0:
+            deleted = False
+        else:
+            j += 1
+    return i
+
+def clean_img(img):
+    # Eliminamos aquellas columnas en las
+    # que los elementos de la matriz son iguales a 0
+    return img[0:find_not_zero(img,0), 0:find_not_zero(img,1)]
+
+def create_n_mosaico(imgs_list, n = 70):
+    length = len(imgs_list)
+    if length == 2:
+        mosaico = create_two_mosaico(imgs_list[0], imgs_list[1], n)
+        show_img(mosaico, "transformada")
+        return mosaico
+    elif length == 3:
+        mid = math.floor(len(imgs_list)/2)
+        mosaico = create_two_mosaico(imgs_list[mid], imgs_list[mid+1],n)
+        mosaico = create_two_mosaico(imgs_list[mid-1], mosaico, n)
+        show_img(mosaico, "transformada")
+        return mosaico
+    else:
+        mid = math.floor(len(imgs_list) / 2)
+        mosaico = create_two_mosaico(imgs_list[mid], imgs_list[mid+1], n)
+        for i in range(mid+2, length):
+            mosaico = create_two_mosaico(mosaico, imgs_list[i],n)
+        for i in range(1,mid+1):
+            mosaico = create_two_mosaico(imgs_list[mid-i],mosaico,n)
+        show_img(mosaico, "transformada")
+        return mosaico
+
+
+def get_homography(img1, img2, n):
     # Obtenemos los puntos clave y descriptores de cada imagen,
     # junto con las correspondencias entre ambas imágenes.
-    kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2,show_matches=False)
+    kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2, show_matches=False)
     # Tras esto, obtenemos las coordenadas de los puntos
     # claves de ambas imágenes.
-    src_points = np.float32([kp_dsp2[0][point.trainIdx].pt for point in matches]).reshape(-1,1,2)
-    dest_points = np.float32([kp_dsp1[0][point.queryIdx].pt for point in matches]).reshape(-1,1,2)
+    src_points = np.float32([kp_dsp2[0][point.trainIdx].pt for point in matches][0:n]).reshape(-1, 1, 2)
+    dest_points = np.float32([kp_dsp1[0][point.queryIdx].pt for point in matches][0:n]).reshape(-1, 1, 2)
     # Obtenemos la primera homografía y la máscara booleana de puntos buenos
     # que hemos obtenido, para después pasar a "entrenar" o "refinar".
-    H, boolean_mask = cv2.findHomography(srcPoints=src_points,
-                                         dstPoints=dest_points,
-                                         method=cv2.RANSAC,
-                                         ransacReprojThreshold=error)
+    return cv2.findHomography(src_points,dest_points,cv2.RANSAC,1)
+
+def create_two_mosaico(img1, img2, n, show = False):
+
+    H, boolean_mask = get_homography(img1, img2, n)
 
     # Realizamos la transformación a la imagen
-    canvas = cv2.warpPerspective(src=img2, M=H, dsize=(img2.shape[1]+img1.shape[1], img2.shape[0]))
+    canvas = cv2.warpPerspective(src=img2, M=H,
+                                 dsize=(img2.shape[1]+img1.shape[1],
+                                        max(img2.shape[0],img1.shape[0])))
     # Y añadimos la otra imagen
     canvas[0:img1.shape[0], 0:img1.shape[1]] = img1
-    show_img(canvas,"transformada")
+
+    canvas = clean_img(canvas)
+
+    if show:
+        show_img(canvas,"transformada")
 
     return canvas
