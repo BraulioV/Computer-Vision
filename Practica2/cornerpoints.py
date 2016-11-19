@@ -308,7 +308,7 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
 def create_mosaico(imgs_list):
     pass
 
-def create_two_mosaico(img1, img2, error=1, max_iters = 150):
+def create_two_mosaico(img1, img2, error=1, max_iters = 75):
     # Obtenemos los puntos clave y descriptores de cada imagen,
     # junto con las correspondencias entre ambas imágenes.
     kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2,show_matches=False)
@@ -318,43 +318,15 @@ def create_two_mosaico(img1, img2, error=1, max_iters = 150):
     dest_points = np.float32([kp_dsp1[0][point.queryIdx].pt for point in matches]).reshape(-1,1,2)
     # Obtenemos la primera homografía y la máscara booleana de puntos buenos
     # que hemos obtenido, para después pasar a "entrenar" o "refinar".
-    H, boolean_mask = cv2.findHomography(srcPoints=np.float32(src_points).reshape(-1,1,2),
-                                         dstPoints=np.float32(dest_points).reshape(-1,1,2),
+    H, boolean_mask = cv2.findHomography(srcPoints=src_points,
+                                         dstPoints=dest_points,
                                          method=cv2.RANSAC,
                                          ransacReprojThreshold=error)
 
-    # Contamos el número de puntos que no apoyan la homografía H
-    not_supporting_points = len(boolean_mask[boolean_mask == 0])
-    n_iters = 0
-    # Almacenamos la mejor homografía
-    best_H = np.copy(H)
-    while n_iters < max_iters:
-        # Calculamos nuevas parejas de puntos
-        kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2,
-                                                             points_mask = boolean_mask,
-                                                             show_matches=False)
-        # Obtenemos sus puntos
-        src_points = np.float32([kp_dsp2[0][point.trainIdx].pt for point in matches]).reshape(-1,1,2)
-        dest_points = np.float32([ kp_dsp1[0][point.queryIdx].pt for point in matches]).reshape(-1,1,2)
-        
-        # Calculamos una nueva homografía
-        H, bools = cv2.findHomography(srcPoints=np.float32(src_points).reshape(-1,1,2),
-                                             dstPoints=np.float32(dest_points).reshape(-1,1,2),
-                                             method=cv2.RANSAC,
-                                             ransacReprojThreshold=error,
-                                             mask=boolean_mask)
-        n_iters+=1
-        if not_supporting_points < len(boolean_mask[boolean_mask == 0]):
-            not_supporting_points = len(boolean_mask[boolean_mask == 0])
-            best_H = np.copy(H)
-            print(not_supporting_points)
+    # Realizamos la transformación a la imagen
+    canvas = cv2.warpPerspective(src=img2, M=H, dsize=(img2.shape[1]+img1.shape[1], img2.shape[0]))
+    # Y añadimos la otra imagen
+    canvas[0:img1.shape[0], 0:img1.shape[1]] = img1
+    show_img(canvas,"transformada")
 
-    img_transformed = cv2.warpPerspective(src=img2, dst=img1, M=H, dsize=(img2.shape[1]*2, img2.shape[0]))
-    
-    show_img(img_transformed,"transformada")
-
-    canvas = np.zeros(shape=(img1.shape[0]+img2.shape[0]+50,img1.shape[1]+img2.shape[1]+50))
-
-    print(not_supporting_points)
-    print(H)
-    return best_H
+    return canvas

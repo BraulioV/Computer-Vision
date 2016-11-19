@@ -10,7 +10,6 @@
   <component name="ChangeListManager">
     <list default="true" id="590ea915-2e7d-4349-ba73-7b2618a33e7a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Practica2/Detección_de_puntos_relevantes_y_Construcción_de_panoramas.ipynb" afterPath="$PROJECT_DIR$/Practica2/Detección_de_puntos_relevantes_y_Construcción_de_panoramas.ipynb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Practica2/cornerpoints.py" afterPath="$PROJECT_DIR$/Practica2/cornerpoints.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
@@ -24,7 +23,7 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Computer-Vision$functions__1_.coverage" NAME="functions (1) Coverage Results" MODIFIED="1478087209825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
     <SUITE FILE_PATH="coverage/Computer-Vision$main.coverage" NAME="main Coverage Results" MODIFIED="1477307715097" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica1" />
-    <SUITE FILE_PATH="coverage/Computer-Vision$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1479423756147" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
+    <SUITE FILE_PATH="coverage/Computer-Vision$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1479560243830" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica2" />
     <SUITE FILE_PATH="coverage/Computer-Vision$functions.coverage" NAME="functions Coverage Results" MODIFIED="1476455446989" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Practica1" />
   </component>
   <component name="CreatePatchCommitExecutor">
@@ -39,8 +38,8 @@
       <file leaf-file-name="functions.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Practica2/functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2701">
-              <caret line="472" column="0" selection-start-line="472" selection-start-column="0" selection-end-line="472" selection-end-column="0" />
+            <state relative-caret-position="222">
+              <caret line="43" column="53" selection-start-line="41" selection-start-column="4" selection-end-line="43" selection-end-column="53" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -51,8 +50,8 @@
       <file leaf-file-name="cornerpoints.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Practica2/cornerpoints.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="177">
-              <caret line="214" column="74" selection-start-line="214" selection-start-column="74" selection-end-line="214" selection-end-column="74" />
+            <state relative-caret-position="485">
+              <caret line="330" column="4" selection-start-line="330" selection-start-column="4" selection-end-line="330" selection-end-column="4" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -63,10 +62,12 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Practica2/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="7" column="56" selection-start-line="7" selection-start-column="56" selection-end-line="7" selection-end-column="56" />
+            <state relative-caret-position="150">
+              <caret line="11" column="56" selection-start-line="11" selection-start-column="56" selection-end-line="11" selection-end-column="56" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
+                <marker date="1479553820974" expanded="true" signature="64:1178" ph="..." />
+                <marker date="1479553820974" expanded="true" signature="1079:1178" ph="..." />
               </folding>
             </state>
           </provider>
@@ -152,6 +153,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -186,8 +189,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -200,6 +201,119 @@
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/Practica2" />
     </key>
+  </component>
+  <component name="RestoreUpdateTree" date="Moments ago" ActionInfo="_Update">
+    <UpdatedFiles>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Updated from server" />
+        <option name="myStatusName" value="Changed on server" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="CHANGED_ON_SERVER" />
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Updated" />
+          <option name="myStatusName" value="Changed" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="UPDATED" />
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/Practica2/cornerpoints.py</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/Practica2/main.py</PATH>
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Created" />
+          <option name="myStatusName" value="Created" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="CREATED" />
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/Practica2/imagenes/mosaico-1/.directory</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/Practica2/imagenes/yosemite_full/.directory</PATH>
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Deleted" />
+          <option name="myStatusName" value="Deleted" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="true" />
+          <option name="myId" value="REMOVED_FROM_REPOSITORY" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Restored" />
+          <option name="myStatusName" value="Will be restored" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="RESTORED" />
+        </FILE-GROUP>
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Modified" />
+        <option name="myStatusName" value="Modified" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MODIFIED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Skipped" />
+        <option name="myStatusName" value="Skipped" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="SKIPPED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with conflicts" />
+        <option name="myStatusName" value="Will be merged with conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_CONFLICTS" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with tree conflicts" />
+        <option name="myStatusName" value="Merged with tree conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with property conflicts" />
+        <option name="myStatusName" value="Will be merged with property conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged" />
+        <option name="myStatusName" value="Will be merged" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Not in repository" />
+        <option name="myStatusName" value="Not in repository" />
+        <option name="mySupportsDeletion" value="true" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="UNKNOWN" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Locally added" />
+        <option name="myStatusName" value="Locally added" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="LOCALLY_ADDED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Locally removed" />
+        <option name="myStatusName" value="Locally removed" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="LOCALLY_REMOVED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Switched" />
+        <option name="myStatusName" value="Switched" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="SWITCHED" />
+      </FILE-GROUP>
+    </UpdatedFiles>
   </component>
   <component name="RunManager" selected="Python.main (1)">
     <configuration default="false" name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -724,20 +838,27 @@
       <option name="project" value="LOCAL" />
       <updated>1479411368970</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Documentado el ejercicio, y corregido algunos fallos de cornerpoints">
+      <created>1479424037065</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1479424037065</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1044" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.04429029" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1189968" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32824427" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32824427" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3031625" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30752453" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293348" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -788,7 +909,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="cambiada la función de insertar en otra imagen, para permitir añadir o sustituir el valor, comentarios en las funciones, limpieza de prints, y añadida la función para crear un canvas piramidal" />
     <MESSAGE value="Función para generar un canvas continuo" />
     <MESSAGE value="Jupyter actualizado" />
     <MESSAGE value="Jupyter actualizado - queda por corregir que se puedan mostrar imágenes en escala de grises en jupyter" />
@@ -813,7 +933,8 @@
     <MESSAGE value="arreglado el ángulo del descriptor, y el jupyter" />
     <MESSAGE value="Ya funciona el findHomography" />
     <MESSAGE value="Quitadas algunas cosillas" />
-    <option name="LAST_COMMIT_MESSAGE" value="Quitadas algunas cosillas" />
+    <MESSAGE value="Documentado el ejercicio, y corregido algunos fallos de cornerpoints" />
+    <option name="LAST_COMMIT_MESSAGE" value="Documentado el ejercicio, y corregido algunos fallos de cornerpoints" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -838,6 +959,8 @@
           <caret line="7" column="57" selection-start-line="7" selection-start-column="57" selection-end-line="7" selection-end-column="57" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+            <marker date="1479553820974" expanded="true" signature="64:1178" ph="..." />
+            <marker date="1479553820974" expanded="true" signature="1079:1178" ph="..." />
           </folding>
         </state>
       </provider>
@@ -858,6 +981,8 @@
           <caret line="7" column="57" selection-start-line="7" selection-start-column="57" selection-end-line="7" selection-end-column="57" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+            <marker date="1479553820974" expanded="true" signature="64:1178" ph="..." />
+            <marker date="1479553820974" expanded="true" signature="1079:1178" ph="..." />
           </folding>
         </state>
       </provider>
@@ -878,6 +1003,8 @@
           <caret line="7" column="57" selection-start-line="7" selection-start-column="57" selection-end-line="7" selection-end-column="57" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+            <marker date="1479553820974" expanded="true" signature="64:1178" ph="..." />
+            <marker date="1479553820974" expanded="true" signature="1079:1178" ph="..." />
           </folding>
         </state>
       </provider>
@@ -898,6 +1025,8 @@
           <caret line="7" column="55" selection-start-line="7" selection-start-column="55" selection-end-line="7" selection-end-column="55" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+            <marker date="1479553820974" expanded="true" signature="64:1178" ph="..." />
+            <marker date="1479553820974" expanded="true" signature="1079:1178" ph="..." />
           </folding>
         </state>
       </provider>
@@ -918,6 +1047,8 @@
           <caret line="7" column="55" selection-start-line="7" selection-start-column="55" selection-end-line="7" selection-end-column="55" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+            <marker date="1479553820974" expanded="true" signature="64:1178" ph="..." />
+            <marker date="1479553820974" expanded="true" signature="1079:1178" ph="..." />
           </folding>
         </state>
       </provider>
@@ -938,6 +1069,8 @@
           <caret line="7" column="57" selection-start-line="7" selection-start-column="57" selection-end-line="7" selection-end-column="57" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+            <marker date="1479553820974" expanded="true" signature="64:1178" ph="..." />
+            <marker date="1479553820974" expanded="true" signature="1079:1178" ph="..." />
           </folding>
         </state>
       </provider>
@@ -958,6 +1091,8 @@
           <caret line="7" column="57" selection-start-line="7" selection-start-column="57" selection-end-line="7" selection-end-column="57" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+            <marker date="1479553820974" expanded="true" signature="64:1178" ph="..." />
+            <marker date="1479553820974" expanded="true" signature="1079:1178" ph="..." />
           </folding>
         </state>
       </provider>
@@ -978,6 +1113,8 @@
           <caret line="7" column="50" selection-start-line="7" selection-start-column="50" selection-end-line="7" selection-end-column="50" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+            <marker date="1479553820974" expanded="true" signature="64:1178" ph="..." />
+            <marker date="1479553820974" expanded="true" signature="1079:1178" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1005,6 +1142,8 @@
           <caret line="4" column="67" selection-start-line="4" selection-start-column="67" selection-end-line="4" selection-end-column="67" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+            <marker date="1479553820974" expanded="true" signature="64:1178" ph="..." />
+            <marker date="1479553820974" expanded="true" signature="1079:1178" ph="..." />
           </folding>
         </state>
       </provider>
@@ -1262,7 +1401,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
           <caret line="1579" column="0" selection-start-line="1579" selection-start-column="0" selection-end-line="1579" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1270,34 +1408,35 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
           <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Practica2/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="11" column="56" selection-start-line="11" selection-start-column="56" selection-end-line="11" selection-end-column="56" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+            <marker date="1479553820974" expanded="true" signature="64:1178" ph="..." />
+            <marker date="1479553820974" expanded="true" signature="1079:1178" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Practica2/functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2701">
-          <caret line="472" column="0" selection-start-line="472" selection-start-column="0" selection-end-line="472" selection-end-column="0" />
+        <state relative-caret-position="222">
+          <caret line="43" column="53" selection-start-line="41" selection-start-column="4" selection-end-line="43" selection-end-column="53" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Practica2/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="56" selection-start-line="7" selection-start-column="56" selection-end-line="7" selection-end-column="56" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Practica2/cornerpoints.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="177">
-          <caret line="214" column="74" selection-start-line="214" selection-start-column="74" selection-end-line="214" selection-end-column="74" />
+        <state relative-caret-position="485">
+          <caret line="330" column="4" selection-start-line="330" selection-start-column="4" selection-end-line="330" selection-end-column="4" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
