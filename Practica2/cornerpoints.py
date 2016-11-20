@@ -284,7 +284,7 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
     keypoints1, descriptors1 = detector.detectAndCompute(image=img1_gray, mask=points_mask)
     keypoints2, descriptors2 = detector.detectAndCompute(image=img2_gray, mask=points_mask)
     # Creamos el BFmatcher (Brute Force) que usará validación cruzada
-    bf = cv2.BFMatcher(normType=cv2.NORM_L1, crossCheck=True)
+    bf = cv2.BFMatcher(normType=cv2.NORM_L2, crossCheck=True)
     # Detectamos las correspondencias o matches
     matches = bf.match(descriptors1,descriptors2)
     # Y las ordenamos según la distancia
@@ -335,25 +335,31 @@ def clean_img(img):
 
 def create_n_mosaico(imgs_list, n = 70):
     length = len(imgs_list)
+    # Si la longitud es igual a dos, se genera un mosaico
+    # de dos imágenes llamando a create_two_mosaic
     if length == 2:
-        mosaico = create_two_mosaico(imgs_list[0], imgs_list[1], n)
+        mosaico = create_two_mosaic(imgs_list[0], imgs_list[1], n)
         show_img(mosaico, "transformada")
-        return mosaico
+    # Si la longitud es tres, primero creamos un mosaico
+    # con la foto central y la derecha, para luego hacer una
     elif length == 3:
         mid = math.floor(len(imgs_list)/2)
-        mosaico = create_two_mosaico(imgs_list[mid], imgs_list[mid+1],n)
-        mosaico = create_two_mosaico(imgs_list[mid-1], mosaico, n)
+        mosaico = create_two_mosaic(imgs_list[mid], imgs_list[mid+1],n)
+        mosaico = create_two_mosaic(imgs_list[mid-1], mosaico, n)
         show_img(mosaico, "transformada")
-        return mosaico
     else:
+        # En caso de que sean más de 3 imágenes, vamos componiendo el mosaico
+        # desde el centro a la derecha, para luego
+        # hacerlo del centro a la izquierda
         mid = math.floor(len(imgs_list) / 2)
-        mosaico = create_two_mosaico(imgs_list[mid], imgs_list[mid+1], n)
+        mosaico = create_two_mosaic(imgs_list[mid], imgs_list[mid+1], n)
         for i in range(mid+2, length):
-            mosaico = create_two_mosaico(mosaico, imgs_list[i],n)
+            mosaico = create_two_mosaic(mosaico, imgs_list[i],n)
         for i in range(1,mid+1):
-            mosaico = create_two_mosaico(imgs_list[mid-i],mosaico,n)
+            mosaico = create_two_mosaic(imgs_list[mid-i],mosaico,n)
         show_img(mosaico, "transformada")
-        return mosaico
+
+    return mosaico
 
 
 def get_homography(img1, img2, n):
@@ -368,7 +374,7 @@ def get_homography(img1, img2, n):
     # que hemos obtenido, para después pasar a "entrenar" o "refinar".
     return cv2.findHomography(src_points,dest_points,cv2.RANSAC,1)
 
-def create_two_mosaico(img1, img2, n, show = False):
+def create_two_mosaic(img1, img2, n, show = False):
 
     H, boolean_mask = get_homography(img1, img2, n)
 
@@ -378,9 +384,9 @@ def create_two_mosaico(img1, img2, n, show = False):
                                         max(img2.shape[0],img1.shape[0])))
     # Y añadimos la otra imagen
     canvas[0:img1.shape[0], 0:img1.shape[1]] = img1
-
+    # Eliminamos los bordes
     canvas = clean_img(canvas)
-
+    # Mostramos si el flag está activo
     if show:
         show_img(canvas,"transformada")
 
