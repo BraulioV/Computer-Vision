@@ -305,6 +305,20 @@ def AKAZE_descriptor_matcher(img1, img2, use_KAZE_detector = False,
 # Ejercicio 3
 ########################################################################
 
+def get_homography(img1, img2, n):
+    # Obtenemos los puntos clave y descriptores de cada imagen,
+    # junto con las correspondencias entre ambas imágenes.
+    kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2, show_matches=False)
+    # Tras esto, obtenemos las coordenadas de los puntos
+    # claves de ambas imágenes.
+    src_points = np.float32([kp_dsp2[0][point.trainIdx].pt for point in matches][0:n]).reshape(-1, 1, 2)
+    dest_points = np.float32([kp_dsp1[0][point.queryIdx].pt for point in matches][0:n]).reshape(-1, 1, 2)
+    # Obtenemos la primera homografía y la máscara booleana de puntos buenos
+    # que hemos obtenido, para después pasar a "entrenar" o "refinar".
+    return cv2.findHomography(src_points,dest_points,cv2.RANSAC,1)
+
+
+
 def find_not_zero(img, axis):
     if axis == 0:
         i = img.shape[0] - 1
@@ -319,60 +333,14 @@ def find_not_zero(img, axis):
             deleted = False
         else:
             i -= 1
-    deleted = True
-    j = 0
-    while deleted:
-        if f(j) != 0:
-            deleted = False
-        else:
-            j += 1
     return i
+
 
 def clean_img(img):
     # Eliminamos aquellas columnas en las
     # que los elementos de la matriz son iguales a 0
     return img[0:find_not_zero(img,0), 0:find_not_zero(img,1)]
 
-def create_n_mosaico(imgs_list, n = 70):
-    length = len(imgs_list)
-    # Si la longitud es igual a dos, se genera un mosaico
-    # de dos imágenes llamando a create_two_mosaic
-    if length == 2:
-        mosaico = create_two_mosaic(imgs_list[0], imgs_list[1], n)
-        show_img(mosaico, "transformada")
-    # Si la longitud es tres, primero creamos un mosaico
-    # con la foto central y la derecha, para luego hacer una
-    elif length == 3:
-        mid = math.floor(len(imgs_list)/2)
-        mosaico = create_two_mosaic(imgs_list[mid], imgs_list[mid+1],n)
-        mosaico = create_two_mosaic(imgs_list[mid-1], mosaico, n)
-        show_img(mosaico, "transformada")
-    else:
-        # En caso de que sean más de 3 imágenes, vamos componiendo el mosaico
-        # desde el centro a la derecha, para luego
-        # hacerlo del centro a la izquierda
-        mid = math.floor(len(imgs_list) / 2)
-        mosaico = create_two_mosaic(imgs_list[mid], imgs_list[mid+1], n)
-        for i in range(mid+2, length):
-            mosaico = create_two_mosaic(mosaico, imgs_list[i],n)
-        for i in range(1,mid+1):
-            mosaico = create_two_mosaic(imgs_list[mid-i],mosaico,n)
-        show_img(mosaico, "transformada")
-
-    return mosaico
-
-
-def get_homography(img1, img2, n):
-    # Obtenemos los puntos clave y descriptores de cada imagen,
-    # junto con las correspondencias entre ambas imágenes.
-    kp_dsp1, kp_dsp2, matches = AKAZE_descriptor_matcher(img1, img2, show_matches=False)
-    # Tras esto, obtenemos las coordenadas de los puntos
-    # claves de ambas imágenes.
-    src_points = np.float32([kp_dsp2[0][point.trainIdx].pt for point in matches][0:n]).reshape(-1, 1, 2)
-    dest_points = np.float32([kp_dsp1[0][point.queryIdx].pt for point in matches][0:n]).reshape(-1, 1, 2)
-    # Obtenemos la primera homografía y la máscara booleana de puntos buenos
-    # que hemos obtenido, para después pasar a "entrenar" o "refinar".
-    return cv2.findHomography(src_points,dest_points,cv2.RANSAC,1)
 
 def create_two_mosaic(img1, img2, n, show = False):
 
@@ -388,6 +356,34 @@ def create_two_mosaic(img1, img2, n, show = False):
     canvas = clean_img(canvas)
     # Mostramos si el flag está activo
     if show:
-        show_img(canvas,"transformada")
+        show_img(canvas,"Mosaico")
 
     return canvas
+
+
+def create_n_mosaico(imgs_list, n = 70):
+    length = len(imgs_list)
+    # Si la longitud es igual a dos, se genera un mosaico
+    # de dos imágenes llamando a create_two_mosaic
+    if length == 2:
+        mosaico = create_two_mosaic(imgs_list[0], imgs_list[1], n)
+        
+    # Si la longitud es tres, primero creamos un mosaico
+    # con la foto central y la derecha, para luego hacer una
+    elif length == 3:
+        mid = math.floor(len(imgs_list)/2)
+        mosaico = create_two_mosaic(imgs_list[mid], imgs_list[mid+1],n)
+        mosaico = create_two_mosaic(imgs_list[mid-1], mosaico, n)
+    else:
+        # En caso de que sean más de 3 imágenes, vamos componiendo el mosaico
+        # desde el centro a la derecha, para luego
+        # hacerlo del centro a la izquierda
+        mid = math.floor(len(imgs_list) / 2)
+        mosaico = create_two_mosaic(imgs_list[mid], imgs_list[mid+1], n)
+        for i in range(mid+2, length):
+            mosaico = create_two_mosaic(mosaico, imgs_list[i],n)
+        for i in range(1,mid+1):
+            mosaico = create_two_mosaic(imgs_list[mid-i],mosaico,n)
+    
+    show_img(mosaico, "transformada")
+    return mosaico
