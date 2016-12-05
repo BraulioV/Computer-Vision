@@ -318,7 +318,6 @@ def get_homography(img1, img2, n):
     return cv2.findHomography(src_points,dest_points,cv2.RANSAC,1)
 
 
-
 def find_not_zero(img, axis):
     if axis == 0:
         i = img.shape[0] - 1
@@ -333,7 +332,7 @@ def find_not_zero(img, axis):
             deleted = False
         else:
             i -= 1
-    return i
+    return i-5
 
 
 def clean_img(img):
@@ -361,7 +360,7 @@ def create_two_mosaic(img1, img2, n, show = False):
     return canvas
 
 
-def create_n_mosaico(imgs_list, n = 70):
+def create_n_mosaico(imgs_list, k, n = 70):
     length = len(imgs_list)
     # Si la longitud es igual a dos, se genera un mosaico
     # de dos imágenes llamando a create_two_mosaic
@@ -385,5 +384,6 @@ def create_n_mosaico(imgs_list, n = 70):
         for i in range(1,mid+1):
             mosaico = create_two_mosaic(imgs_list[mid-i],mosaico,n)
     
-    show_img(mosaico, "transformada")
+    # show_img(mosaico, "Mosaico")
+    cv2.imwrite(k, mosaico)
     return mosaico
