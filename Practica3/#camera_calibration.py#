@@ -38,3 +38,4 @@ def generate_points():
     set2 = np.hstack((np.zeros(conjunto, points2D.shape[0]).T))
 
     return set1, set2
+
