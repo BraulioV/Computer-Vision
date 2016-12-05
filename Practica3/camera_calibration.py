@@ -20,10 +20,11 @@ def generate_Pcamera():
 
     # Comprobamos si det(M) != 0. En caso de que no lo
     # sea, volvemos a generar una nueva matriz cámara.
-    while not np.linalg.det(P[0:3,0:3]):
+    while not np.linalg.det(P_cam[0:3,0:3]):
         P_cam = np.random.rand(3,4)        
     
     return P_cam
+
 
 def generate_points():
     # Generamos los valores de x1 y x2
@@ -31,11 +32,24 @@ def generate_points():
                    step = 0.1, dtype=np.float32)
     x2 = np.arange(start = 0, stop = 1,
                    step = 0.1, dtype=np.float32)
+    # Obtenemos una combinación de los puntos que hemos obtenido
+    points2D = np.concatenate(np.array(np.meshgrid(x1,x2)).T)
 
-    points2D = np.concatenate(np.array(np.meshgrid(x1,x2)).T,np.zeros(x1.shape[0]))
-
-    set1 = np.hstack((np.zeros(points2D.shape[0]).T, conjunto))
-    set2 = np.hstack((np.zeros(conjunto, points2D.shape[0]).T))
+    set1 = np.hstack((np.zeros(points2D.shape[0])[..., None], points2D))
+    set2 = np.hstack((points2D, np.zeros(points2D.shape[0])[..., None]))
 
     return set1, set2
 
+
+def project_points(points, camera):
+    projection = np.zeros(shape=points.shape, dtype=np.float32)
+    for i in range(points.shape[0]):
+        projection[i:,] = (camera*points[i]).T
+
+    return projection
+
+# x1,x2 = generate_points()
+# cam = generate_Pcamera()
+#
+# print(project_points(x1, cam))
+#
