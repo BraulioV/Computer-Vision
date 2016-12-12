@@ -2,6 +2,7 @@ import cv2
 import math
 import numpy as np
 import functions as fx
+
 ############################################################
 #                       Ejercicio 1
 # Estimación de la matriz de una cámara a partir
@@ -34,10 +35,10 @@ def generate_points():
                    step = 0.1, dtype=np.float32)
     # Obtenemos una combinación de los puntos que hemos obtenido
     points2D = np.concatenate(np.array(np.meshgrid(x1,x2)).T)
-
+    # Añadimos un cero por la izquierda y uno por la derecha respectivamente
     set1 = np.hstack((np.zeros(points2D.shape[0])[..., None], points2D))
     set2 = np.hstack((points2D, np.zeros(points2D.shape[0])[..., None]))
-
+    # Y devolvemos un único conjunto de puntos
     return np.concatenate((set1, set2))
 
 
@@ -46,10 +47,22 @@ def project_points(points, camera):
     homogeneus_points = np.hstack((points, (np.ones(points.shape[0]))[...,None]))
     # Obtenemos una matriz vacía que serán las proyecciones
     # de los puntos al pasar por la cámara.
-    projection = np.zeros(shape=points.shape, dtype=np.float32)
+    projection = np.zeros(shape=(points.shape[0],2), dtype=np.float32)
     # Realizamos la multiplicación
     #    xy' = P * xy
     for i in range(homogeneus_points.shape[0]):
-        projection[i] = np.dot(camera,homogeneus_points[i].T)
+        point = np.dot(camera,homogeneus_points[i].T)
+        projection[i,0] = point[0]/point[2]
+        projection[i,1] = point[1]/point[2]
+
     # Devolvemos las proyecciones de los puntos
-    return projection
+    return homogeneus_points, projection
+
+
+#def DLT_algorithm(3D_points, projected_points):
+    # Recorremos todos los puntos 3D que tenemos
+
+    #for i in range(3D_points.shape[0]):
+        #pass
+
+    
