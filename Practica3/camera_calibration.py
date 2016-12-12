@@ -38,18 +38,18 @@ def generate_points():
     set1 = np.hstack((np.zeros(points2D.shape[0])[..., None], points2D))
     set2 = np.hstack((points2D, np.zeros(points2D.shape[0])[..., None]))
 
-    return set1, set2
+    return np.concatenate((set1, set2))
 
 
 def project_points(points, camera):
     projection = np.zeros(shape=points.shape, dtype=np.float32)
+    homogeneus = np.hstack((points, (np.ones(points.shape[0]))[...,None]))
     for i in range(points.shape[0]):
-        projection[i:,] = (camera*points[i]).T
+        projection[i] = (camera*homogeneus_points[i].T)
 
     return projection
 
-# x1,x2 = generate_points()
-# cam = generate_Pcamera()
-#
-# print(project_points(x1, cam))
-#
+#camera = generate_Pcamera()
+#points = generate_points()
+
+#projection = project_points(points, camera)
