@@ -42,14 +42,14 @@ def generate_points():
 
 
 def project_points(points, camera):
+    # Pasamos las coordenadas de los puntos a coordenadas homogéneas
+    homogeneus_points = np.hstack((points, (np.ones(points.shape[0]))[...,None]))
+    # Obtenemos una matriz vacía que serán las proyecciones
+    # de los puntos al pasar por la cámara.
     projection = np.zeros(shape=points.shape, dtype=np.float32)
-    homogeneus = np.hstack((points, (np.ones(points.shape[0]))[...,None]))
-    for i in range(points.shape[0]):
-        projection[i] = (camera*homogeneus_points[i].T)
-
+    # Realizamos la multiplicación
+    #    xy' = P * xy
+    for i in range(homogeneus_points.shape[0]):
+        projection[i] = np.dot(camera,homogeneus_points[i].T)
+    # Devolvemos las proyecciones de los puntos
     return projection
-
-#camera = generate_Pcamera()
-#points = generate_points()
-
-#projection = project_points(points, camera)
