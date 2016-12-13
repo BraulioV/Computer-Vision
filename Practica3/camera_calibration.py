@@ -59,10 +59,56 @@ def project_points(points, camera):
     return homogeneus_points, projection
 
 
-#def DLT_algorithm(3D_points, projected_points):
+# Los puntos han de ser en coordenadas homogéneas
+def normalize(points):
+    # Obtenemos la media de los puntos y su desviación
+    # típica para normalizar los datos
+    x_mean = np.mean(points, 0)
+    y_mean = np.mean(points, 1)
+    s = np.std(points)
+
+    # Creamos la matriz N para normalizar los puntos, esta
+    # matriz tiene la forma:
+    if len(points.shape) == 2:
+        N = np.matrix([ [s, 0, -s*x_mean], [0, s, -s*y_mean], [0, 0, 1]], dtype=np.float32)
+    else:
+        N = np.matrix([ [s, 0, 0, -s*x_mean], [0, s, 0, -s*y_mean], [0, 0, 0, 1]], dtype=np.float32)
+
+    N = np.linalg.inv(N)
+    normalized_points = np.dot(N, points)
+    normalized_points = normalized_points[0:normalized_points.shape[1]-1,:].T
+
+    return normalized_points, N
+
+
+def DLT_algorithm(real_points, projected_points, camera):
+    # Normalizamos los puntos para mejorar el resultado
+    # del algoritmo DLT
+    N_matrix, normalized_points = normalize(real_points)
     # Recorremos todos los puntos 3D que tenemos
+    # y generamos una matriz M con todos los puntos
+    aux = []
+    for i in range(normalized_points.shape[0]):
+        x_i, y_i, z_i = normalized_points[i,0], normalized_points[i,1], normalized_points[i,2]
+        u, v = projected_points[i,0], projected_points[i,1]
+        aux.append([x_i, y_i, z_i, 1, 0, 0, 0, 0, -u*x_i, -u*y_i, -u*z_i, -u])
+        aux.append([0, 0, 0, 1, x_i, y_i, z_i, 1, -v*x_i, -v*y_i, -v*z_i, -v])
 
-    #for i in range(3D_points.shape[0]):
-        #pass
-
+    # Descomponemos la matriz
+    U, s, V = np.linalg.svd(np.matrix(aux, dtype=np.float32))
+    # Obtenemos los parámetros
+    camera_estimated = V[-1,:]/V[-1,-1]
+    camera_estimated.reshape(3,normalized_points.shape[1]+1)
+    # Desnormalizamos
+    camera_estimated = np.dot( np.dot( np.linalg.pinv(N_matrix), camera_estimated), N_matrix)
+    camera_estimated = camera_estimated/camera_estimated[-1,-1]
     
+    error = ((camera - camera_estimated)**2).mean(axis=None)
+
+    return camera_estimated, error
+
+
+camera = generate_Pcamera()
+points = generate_points()
+hom_points, projected = project_points(points, camera)
+camera_est, err = DLT_algorithm(real_points=hom_points, projected_points=projected, camera=camera)
