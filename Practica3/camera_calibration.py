@@ -107,8 +107,3 @@ def DLT_algorithm(real_points, projected_points, camera):
 
     return camera_estimated, error
 
-
-camera = generate_Pcamera()
-points = generate_points()
-hom_points, projected = project_points(points, camera)
-camera_est, err = DLT_algorithm(real_points=hom_points, projected_points=projected, camera=camera)
