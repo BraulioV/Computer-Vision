@@ -59,10 +59,10 @@ def project_points(points, camera):
     return homogeneus_points, projection
 
 
-#def DLT_algorithm(3D_points, projected_points):
+def DLT_algorithm(3D_points, projected_points):
     # Recorremos todos los puntos 3D que tenemos
 
-    #for i in range(3D_points.shape[0]):
-        #pass
+    for i in range(3D_points.shape[0]):
+        
 
     
