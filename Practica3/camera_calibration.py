@@ -102,8 +102,9 @@ def DLT_algorithm(real_points, projected_points, camera):
     # Desnormalizamos
     camera_estimated = np.dot( np.dot( np.linalg.pinv(N_matrix), camera_estimated), N_matrix)
     camera_estimated = camera_estimated/camera_estimated[-1,-1]
-    
+    # Calculamos el error de la cámara estimada
     error = ((camera - camera_estimated)**2).mean(axis=None)
 
     return camera_estimated, error
+
 

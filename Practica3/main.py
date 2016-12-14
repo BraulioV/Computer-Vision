@@ -1,1 +1,1 @@
-import cv2import camera_calibration as fxif __name__ == '__main__':    x1, x2 = fx.generate_points()    cam = fx.generate_Pcamera()
+import cv2import camera_calibration as ccif __name__ == '__main__':    for i in range(1,26):        images.append(cv2.imread('imagenes/Image'+str(i)+'.tif',                                 flags=cv2.IMREAD_GRAYSCALE))    
