@@ -65,14 +65,15 @@ def normalize(points):
     # típica para normalizar los datos
     x_mean = np.mean(points, 0)
     y_mean = np.mean(points, 1)
+    print(x_mean)
     s = np.std(points)
 
     # Creamos la matriz N para normalizar los puntos, esta
     # matriz tiene la forma:
-    if len(points.shape) == 2:
-        N = np.matrix([ [s, 0, -s*x_mean], [0, s, -s*y_mean], [0, 0, 1]], dtype=np.float32)
+    if len(points[0]) == 2:
+        N = np.matrix([ [s, 0., -s*x_mean], [0., s, -s*y_mean], [0., 0., 1.] ])
     else:
-        N = np.matrix([ [s, 0, 0, -s*x_mean], [0, s, 0, -s*y_mean], [0, 0, 0, 1]], dtype=np.float32)
+        N = np.matrix([ [s, 0., 0., -s*x_mean], [0., s, 0., -s*y_mean], [0., 0., 0., 1.] ])
 
     N = np.linalg.inv(N)
     normalized_points = np.dot(N, points)

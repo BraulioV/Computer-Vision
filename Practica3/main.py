@@ -1,1 +1,1 @@
-import cv2import camera_calibration as fxif __name__ == '__main__':    x1, x2 = fx.generate_points()    cam = fx.generate_Pcamera()
+import cv2import camera_calibration as ccif __name__ == '__main__':    camera = cc.generate_Pcamera()    points = cc.generate_points()    hom_points, projected = cc.project_points(points, camera)    camera_est, err = cc.DLT_algorithm(real_points=hom_points, projected_points=projected, camera=camera)
