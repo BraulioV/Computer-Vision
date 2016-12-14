@@ -63,23 +63,20 @@ def project_points(points, camera):
 def normalize(points):
     # Obtenemos la media de los puntos y su desviación
     # típica para normalizar los datos
-    x_mean = np.mean(points, 0)
-    y_mean = np.mean(points, 1)
-    print(x_mean)
-    s = np.std(points)
+    points_mean = np.mean(points, 0)
+    s = np.std(points[:,0:points.shape[1]-1])
 
     # Creamos la matriz N para normalizar los puntos, esta
     # matriz tiene la forma:
-    if len(points[0]) == 2:
-        N = np.matrix([ [s, 0., -s*x_mean], [0., s, -s*y_mean], [0., 0., 1.] ])
+    if len(points[0]) == 3:
+        N = np.matrix([ [s, 0., -s*points_mean[0]], [0., s, -s*points_mean[1]], [0., 0., 1.] ])
     else:
-        N = np.matrix([ [s, 0., 0., -s*x_mean], [0., s, 0., -s*y_mean], [0., 0., 0., 1.] ])
+        N = np.matrix([[s, 0, 0, -s*points_mean[0]], [0, s, 0, -s*points_mean[1]], [0, 0,s, points_mean[2]], [0, 0, 0, 1]])
 
     N = np.linalg.inv(N)
-    normalized_points = np.dot(N, points)
+    normalized_points = np.dot(N, points.T)
     normalized_points = normalized_points[0:normalized_points.shape[1]-1,:].T
-
-    return normalized_points, N
+    return N, normalized_points
 
 
 def DLT_algorithm(real_points, projected_points, camera):
@@ -99,12 +96,32 @@ def DLT_algorithm(real_points, projected_points, camera):
     U, s, V = np.linalg.svd(np.matrix(aux, dtype=np.float32))
     # Obtenemos los parámetros
     camera_estimated = V[-1,:]/V[-1,-1]
-    camera_estimated.reshape(3,normalized_points.shape[1]+1)
+    camera_estimated = np.matrix(camera_estimated).reshape(3,4)
     # Desnormalizamos
-    camera_estimated = np.dot( np.dot( np.linalg.pinv(N_matrix), camera_estimated), N_matrix)
+    camera_estimated = np.dot(np.dot(camera_estimated, np.linalg.pinv(N_matrix)), N_matrix)
     camera_estimated = camera_estimated/camera_estimated[-1,-1]
-    
-    error = ((camera - camera_estimated)**2).mean(axis=None)
+    # Calculamos el error de la cámara estimada
 
+    error = np.linalg.norm(x=(camera - camera_estimated), ord=None)
+    
     return camera_estimated, error
 
+
+def findValidImages(images):
+    valids = []
+    size = (8, 6)
+
+    cv2_flags = cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_NORMALIZE_IMAGE+cv2.CALIB_CB_FAST_CHECK
+    
+    for img in images:
+        valids.append(cv2.findChessboardCorners(img, size, flags=cv2_flags))
+
+    for i in valids:
+        # Si la imagen es válida, procedemos a refinar
+        # los puntos con cornerSubPix
+        if i[1] is None:
+            print("no valida")                  
+        else:
+            cv2.cornerSubPix(image=img.astype(np.float32), corners=i[1],
+                             winSize=(5, 5), zeroZone=(-1, -1),
+                             criteria=(cv2.TERM_CRITERIA_MAX_ITER | cv2.TERM_CRITERIA_COUNT, 30, 0.01))
