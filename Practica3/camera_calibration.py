@@ -36,8 +36,8 @@ def generate_points():
     # Obtenemos una combinación de los puntos que hemos obtenido
     points2D = np.concatenate(np.array(np.meshgrid(x1,x2)).T)
     # Añadimos un cero por la izquierda y uno por la derecha respectivamente
-    set1 = np.hstack((np.zeros(points2D.shape[0])[..., None], points2D))
-    set2 = np.hstack((points2D, np.zeros(points2D.shape[0])[..., None]))
+    set1 = np.hstack((np.zeros(points2D.shape[0])[...,None], points2D))
+    set2 = np.hstack((points2D, np.zeros(points2D.shape[0])[...,None]))
     # Y devolvemos un único conjunto de puntos
     return np.concatenate((set1, set2))
 
@@ -60,7 +60,7 @@ def project_points(points, camera):
 
 
 # Los puntos han de ser en coordenadas homogéneas
-def normalize(points):
+def normalize(points, dim):
     # Obtenemos la media de los puntos y su desviación
     # típica para normalizar los datos
     points_mean = np.mean(points, 0)
@@ -68,40 +68,42 @@ def normalize(points):
 
     # Creamos la matriz N para normalizar los puntos, esta
     # matriz tiene la forma:
-    if len(points[0]) == 3:
-        N = np.matrix([ [s, 0., -s*points_mean[0]], [0., s, -s*points_mean[1]], [0., 0., 1.] ])
+    if dim == 2:
+        N = np.matrix([ [s, 0, -s*points_mean[0]], [0, s, -s*points_mean[1]], [0, 0, 1] ])
     else:
-        N = np.matrix([[s, 0, 0, -s*points_mean[0]], [0, s, 0, -s*points_mean[1]], [0, 0,s, points_mean[2]], [0, 0, 0, 1]])
+        N = np.matrix([[s, 0, 0, -s*points_mean[0]], [0, s, 0, -s*points_mean[1]], [0, 0, s, -s*points_mean[2]], [0, 0, 0, 1]])
 
     N = np.linalg.inv(N)
     normalized_points = np.dot(N, points.T)
-    normalized_points = normalized_points[0:normalized_points.shape[1]-1,:].T
+    normalized_points = normalized_points[0:normalized_points.shape[1],:].T
+    
     return N, normalized_points
 
 
 def DLT_algorithm(real_points, projected_points, camera):
     # Normalizamos los puntos para mejorar el resultado
     # del algoritmo DLT
-    N_matrix, normalized_points = normalize(real_points)
+    N_matrix, normalized_points = normalize(real_points, 3)
+    homogeneus_proj_pt = np.hstack((projected_points, (np.ones(projected_points.shape[0]))[...,None]))
+    N_matrix2d, norm_points_2d = normalize(homogeneus_proj_pt, 2)
     # Recorremos todos los puntos 3D que tenemos
     # y generamos una matriz M con todos los puntos
     aux = []
     for i in range(normalized_points.shape[0]):
         x_i, y_i, z_i = normalized_points[i,0], normalized_points[i,1], normalized_points[i,2]
-        u, v = projected_points[i,0], projected_points[i,1]
+        u, v = norm_points_2d[i,0], norm_points_2d[i,1]
         aux.append([x_i, y_i, z_i, 1, 0, 0, 0, 0, -u*x_i, -u*y_i, -u*z_i, -u])
         aux.append([0, 0, 0, 1, x_i, y_i, z_i, 1, -v*x_i, -v*y_i, -v*z_i, -v])
 
     # Descomponemos la matriz
-    U, s, V = np.linalg.svd(np.matrix(aux, dtype=np.float32))
+    U, s, V = np.linalg.svd(np.array(aux, dtype=np.float64))
     # Obtenemos los parámetros
     camera_estimated = V[-1,:]/V[-1,-1]
     camera_estimated = np.matrix(camera_estimated).reshape(3,4)
     # Desnormalizamos
-    camera_estimated = np.dot(np.dot(camera_estimated, np.linalg.pinv(N_matrix)), N_matrix)
+    camera_estimated = np.dot(np.dot(np.linalg.pinv(N_matrix2d), camera_estimated), N_matrix)
     camera_estimated = camera_estimated/camera_estimated[-1,-1]
     # Calculamos el error de la cámara estimada
-
     error = np.linalg.norm(x=(camera - camera_estimated), ord=None)
     
     return camera_estimated, error
