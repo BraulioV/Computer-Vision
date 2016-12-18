@@ -22,8 +22,9 @@ def generate_Pcamera():
     # Comprobamos si det(M) != 0. En caso de que no lo
     # sea, volvemos a generar una nueva matriz cámara.
     while not np.linalg.det(P_cam[0:3,0:3]):
-        P_cam = np.random.rand(3,4)        
-    
+        P_cam = np.random.rand(3,4)
+
+    P_cam = P_cam / P_cam[-1,-1]
     return P_cam
 
 
@@ -69,13 +70,13 @@ def normalize(points, dim):
     # Creamos la matriz N para normalizar los puntos, esta
     # matriz tiene la forma:
     if dim == 2:
-        N = np.matrix([ [s, 0, -s*points_mean[0]], [0, s, -s*points_mean[1]], [0, 0, 1] ])
+        N = np.matrix([ [s, 0, points_mean[0]], [0, s, points_mean[1]], [0, 0, 1] ])
     else:
-        N = np.matrix([[s, 0, 0, -s*points_mean[0]], [0, s, 0, -s*points_mean[1]], [0, 0, s, -s*points_mean[2]], [0, 0, 0, 1]])
+        N = np.matrix([[s, 0, 0, points_mean[0]], [0, s, 0, points_mean[1]], [0, 0, s, points_mean[2]], [0, 0, 0, 1]])
 
     N = np.linalg.inv(N)
     normalized_points = np.dot(N, points.T)
-    normalized_points = normalized_points[0:normalized_points.shape[1],:].T
+    normalized_points = normalized_points[0:dim,:].T
     
     return N, normalized_points
 
@@ -93,7 +94,7 @@ def DLT_algorithm(real_points, projected_points, camera):
         x_i, y_i, z_i = normalized_points[i,0], normalized_points[i,1], normalized_points[i,2]
         u, v = norm_points_2d[i,0], norm_points_2d[i,1]
         aux.append([x_i, y_i, z_i, 1, 0, 0, 0, 0, -u*x_i, -u*y_i, -u*z_i, -u])
-        aux.append([0, 0, 0, 1, x_i, y_i, z_i, 1, -v*x_i, -v*y_i, -v*z_i, -v])
+        aux.append([0, 0, 0, 0, x_i, y_i, z_i, 1, -v*x_i, -v*y_i, -v*z_i, -v])
 
     # Descomponemos la matriz
     U, s, V = np.linalg.svd(np.array(aux, dtype=np.float64))

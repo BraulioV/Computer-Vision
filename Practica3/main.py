@@ -7,5 +7,6 @@ if __name__ == '__main__':
     hom_points, projected = cc.project_points(points, camera)
     camera_est, err = cc.DLT_algorithm(real_points=hom_points, projected_points=projected, camera=camera)
     print(camera)
+    print(camera_est)
     print(err)
 
