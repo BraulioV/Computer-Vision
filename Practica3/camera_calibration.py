@@ -70,9 +70,9 @@ def normalize(points, dim):
     # Creamos la matriz N para normalizar los puntos, esta
     # matriz tiene la forma:
     if dim == 2:
-        N = np.matrix([ [s, 0, points_mean[0]], [0, s, points_mean[1]], [0, 0, 1] ])
+        N = np.matrix([ [s, 0, -s*points_mean[0]], [0, s, -s*points_mean[1]], [0, 0, 1] ])
     else:
-        N = np.matrix([[s, 0, 0, points_mean[0]], [0, s, 0, points_mean[1]], [0, 0, s, points_mean[2]], [0, 0, 0, 1]])
+        N = np.matrix([[s, 0, 0, -s*points_mean[0]], [0, s, 0, -s*points_mean[1]], [0, 0, s, -s*points_mean[2]], [0, 0, 0, 1]])
 
     N = np.linalg.inv(N)
     normalized_points = np.dot(N, points.T)
@@ -81,6 +81,8 @@ def normalize(points, dim):
     return N, normalized_points
 
 
+# Algoritmo DLT para obtener una cámara estimada a partir
+# de los puntos en el mundo y los puntos de la retina
 def DLT_algorithm(real_points, projected_points, camera):
     # Normalizamos los puntos para mejorar el resultado
     # del algoritmo DLT
