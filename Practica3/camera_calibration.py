@@ -114,13 +114,13 @@ def DLT_algorithm(real_points, projected_points, camera):
 
 def findValidImages(images):
     valids = []
-    size = (8, 6)
+    size = (13, 12)
     # Seleccionamos los flags que vamos a usar
     cv2_flags =  cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_ADAPTIVE_THRESH | cv2.CALIB_CB_FAST_CHECK | cv2.CALIB_CB_FILTER_QUADS
     
     for img in images:
         valids.append(cv2.findChessboardCorners(img, size, flags=cv2_flags))
-        if not valids[-1][1] is None:
+        if valids[-1][0]:
         # Si la imagen es válida, procedemos a refinar
         # los puntos con cornerSubPix
             cv2.cornerSubPix(image=img.astype(np.float32), corners=valids[-1][1],
@@ -129,7 +129,7 @@ def findValidImages(images):
     
     for i in range(0,len(valids)):
         # Si es un punto válido:
-        if not valids[i][1] is None:
+        if valids[i][0]:
             fx.show_img(cv2.drawChessboardCorners(image = images[i], patternSize = size,
                                                      corners = valids[i][1], patternWasFound = valids[i][0]),
                            "imagen "+str(i))
