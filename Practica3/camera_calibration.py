@@ -126,6 +126,8 @@ def findValidImages(images):
             cv2.cornerSubPix(image=img.astype(np.float32), corners=valids[-1][1],
                              winSize=(5, 5), zeroZone=(-1, -1),
                              criteria=(cv2.TERM_CRITERIA_MAX_ITER | cv2.TERM_CRITERIA_COUNT, 30, 0.001))
+    # Coordenadas de las imágenes seleccionadas
+    coordinates = []
     
     for i in range(0,len(valids)):
         # Si es un punto válido:
@@ -133,3 +135,12 @@ def findValidImages(images):
             fx.show_img(cv2.drawChessboardCorners(image = images[i], patternSize = size,
                                                      corners = valids[i][1], patternWasFound = valids[i][0]),
                            "imagen "+str(i))
+            coordinates.append(valids[i][1])
+            
+     return coordinates
+
+def calculateParameters(coordinates, use_lenss = False):
+    
+    for uv in coordinates:
+        pass
+    
