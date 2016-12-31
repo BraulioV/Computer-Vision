@@ -112,11 +112,16 @@ def DLT_algorithm(real_points, projected_points, camera):
     return camera_estimated, error
 
 
-def findValidImages(images):
+def calibrate_camera_from(images, use_lenss = False):
     valids = []
     size = (13, 12)
     # Seleccionamos los flags que vamos a usar
     cv2_flags =  cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_ADAPTIVE_THRESH | cv2.CALIB_CB_FAST_CHECK | cv2.CALIB_CB_FILTER_QUADS
+    # Creamos nosotros las coordenadas del mundo para poder
+    # compararlas con los puntos de las imágenes 
+    # y generar la cámara
+    world_points =  np.zeros((13*12,3), np.float32)
+    world_points[:,:2] = np.mgrid[0:13,0:12].T.reshape(-1,2)
     
     for img in images:
         valids.append(cv2.findChessboardCorners(img, size, flags=cv2_flags))
@@ -128,19 +133,37 @@ def findValidImages(images):
                              criteria=(cv2.TERM_CRITERIA_MAX_ITER | cv2.TERM_CRITERIA_COUNT, 30, 0.001))
     # Coordenadas de las imágenes seleccionadas
     coordinates = []
-    
+    worldP = []
+    valid_images = []
     for i in range(0,len(valids)):
         # Si es un punto válido:
         if valids[i][0]:
-            fx.show_img(cv2.drawChessboardCorners(image = images[i], patternSize = size,
-                                                     corners = valids[i][1], patternWasFound = valids[i][0]),
-                           "imagen "+str(i))
+            # Mostramos el patrón de puntos encontrado
+            fx.show_img(cv2.drawChessboardCorners(image = images[i], 
+                                                  patternSize = size,
+                                                  corners = valids[i][1], 
+                                                  patternWasFound = valids[i][0]),
+                        "imagen "+str(i))
+            # Almacenamos las coordenadas de los puntos que forman el
+            # patrón para calibrar la cámara
             coordinates.append(valids[i][1])
-            
-     return coordinates
-
-def calculateParameters(coordinates, use_lenss = False):
+            # Las coordenadas del mundo para formar las correspondencias
+            worldP.append(world_points)
+            # Y guardamos las imágenes válidas
+            valid_images.append(images[i])
     
-    for uv in coordinates:
-        pass
+    # Tras esto, llamamos a calibrateCamera para calibrar la
+    # cámara a partir de las coordenadas del mundo y las del 
+    # patrón
+    reprojection_error, camera, distorsion_coefs, rotation_vecs, translation_vecs = cv2.calibrateCamera(worldP, 
+                                                           coordinates, 
+                                                           images[-1].shape[::-1],
+                                                           None,None)
+    print("reprojection_error = ", reprojection_error)
+    print("camera = \n", camera)
+    print("distorsion coeffs = ", distorsion_coefs)
+    print("rotation vecs = \n", rotation_vecs)
+    print("tvecs = \n", translation_vecs)
+    
+
     
