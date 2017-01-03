@@ -184,3 +184,51 @@ def calibrate_camera_from(images, use_lenss = False, alpha = 1):
         # para trabajar más fácilmente.
         print("refined camera = \n", ref_cam)
         fx.show_img(correct_image, 'Resultado con lentes')    
+
+        
+def estimate_fundamental_matrix_from(image1, image2):
+    # Vamos a inicializar un dectector ORB 
+    # y un detector BRISK, y dejaremos aquel que obtenga
+    # más puntos
+    orb_detector = cv2.ORB_create()
+    brisk_detector = cv2.BRISK_create()
+    # Buscamos los keypoints y los descriptores de ambas
+    # imágenes haciendo uso de ORB
+    keyP1_orb, des1_orb = orb_detector.detectAndCompute(image1,None)
+    keyP2_orb, des2_orb = orb_detector.detectAndCompute(image2,None)
+    # Buscamos los keypoints y los descriptores de ambas
+    # imágenes haciendo uso de BRISK
+    keyP1_brisk, des1_brisk = brisk_detector.detectAndCompute(image1,None)
+    keyP2_brisk, des2_brisk = brisk_detector.detectAndCompute(image2,None)
+    # Inicializamos el BFMatcher con la norma Hamming para ORB y BRISK
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+    
+    # Hacemos matching entre los descriptores de ORB
+    matches_orb = bf.match(des1_orb, des2_orb)
+    # y para los de BRISK
+    matches_brisk = bf.match(des1_brisk, des2_brisk)
+    # Calculamos cuál ha obtenido más puntos en
+    # correspondencias y nos quedamos con sus matches
+    if len(matches_orb) > len(matches_brisk):
+        matches = matches_orb
+        print("Puntos en corresponencia usando ORB")
+        img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_orb, 
+                                    img2 = image2, keypoints2 = keyP2_orb, 
+                                    matches1to2 = matches, outImage=None, flags=2)
+        sorted_kp_img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_orb, 
+                                    img2 = image2, keypoints2 = keyP2_orb, 
+                                    matches1to2 = sorted(matches, key = lambda x:x.distance)[0:int(len(matches)*0.15)], 
+                                    outImage=None, flags=2)
+    else:
+        matches = matches_brisk
+        print("Puntos en corresponencia usando BRISK")
+        img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_brisk, 
+                                    img2 = image2, keypoints2 = keyP2_brisk, 
+                                    matches1to2 = matches, outImage=None, flags=2)
+        sorted_kp_img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_brisk, 
+                                    img2 = image2, keypoints2 = keyP2_brisk, 
+                                    matches1to2 = sorted(matches, key = lambda x:x.distance)[0:int(len(matches)*0.15)], 
+                                    outImage=None, flags=2)
+    
+    fx.show_img(img_match, 'Todos los puntos en corresponencias')    
+    fx.show_img(sorted_kp_img_match, 'Todos los puntos en corresponencias')    

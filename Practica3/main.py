@@ -11,11 +11,16 @@ if __name__ == '__main__':
    # print(camera_est)
    # print(err)
     # Ejercicio 2
-    images = []
+    #images = []
 
-    for i in range(1,26):
-        images.append(cv2.imread('imagenes/Image'+str(i)+'.tif', flags=cv2.IMREAD_GRAYSCALE))
+    #for i in range(1,26):
+    #    images.append(cv2.imread('imagenes/Image'+str(i)+'.tif', flags=cv2.IMREAD_GRAYSCALE))
 
-    cc.calibrate_camera_from(images,True)
+    #cc.calibrate_camera_from(images,True)
     
+    
+    vmort1 = cv2.imread('imagenes/Vmort1.pgm', flags=cv2.IMREAD_GRAYSCALE)
+    vmort2 = cv2.imread('imagenes/Vmort2.pgm', flags=cv2.IMREAD_GRAYSCALE)
 
+    
+    cc.estimate_fundamental_matrix_from(vmort1, vmort2)
