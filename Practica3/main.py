@@ -16,6 +16,6 @@ if __name__ == '__main__':
     for i in range(1,26):
         images.append(cv2.imread('imagenes/Image'+str(i)+'.tif', flags=cv2.IMREAD_GRAYSCALE))
 
-    cc.calibrate_camera_from(images)
+    cc.calibrate_camera_from(images,True)
     
 

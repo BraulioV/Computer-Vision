@@ -112,7 +112,7 @@ def DLT_algorithm(real_points, projected_points, camera):
     return camera_estimated, error
 
 
-def calibrate_camera_from(images, use_lenss = False):
+def calibrate_camera_from(images, use_lenss = False, alpha = 1):
     valids = []
     size = (13, 12)
     # Seleccionamos los flags que vamos a usar
@@ -157,7 +157,7 @@ def calibrate_camera_from(images, use_lenss = False):
     # patrón
     reprojection_error, camera, distorsion_coefs, rotation_vecs, translation_vecs = cv2.calibrateCamera(worldP, 
                                                            coordinates, 
-                                                           images[-1].shape[::-1],
+                                                           valid_images[-1].shape[::-1],
                                                            None,None)
     print("reprojection_error = ", reprojection_error)
     print("camera = \n", camera)
@@ -165,5 +165,22 @@ def calibrate_camera_from(images, use_lenss = False):
     print("rotation vecs = \n", rotation_vecs)
     print("tvecs = \n", translation_vecs)
     
-
-    
+    if use_lenss:
+        # si el parámetro use_lenss está activo, vamos a proceder
+        # a quitar la distorsión producida por las lentes. Primero
+        # refinamos la cámara obtenida anteriormente
+        height, width = valid_images[-1].shape[:2]
+        # Devolvemos la cámara y el rectángulo óptimo de píxeles para
+        # evitar la distorsión
+        ref_cam, valid_rectangle = cv2.getOptimalNewCameraMatrix(camera, distorsion_coefs, 
+                                                                 (width, height), alpha, 
+                                                                 (width, height))
+        # Una vez que hemos obtenido la cámara refinada
+        # pasamos a rectificar la distorsión.
+        correct_image = cv2.undistort(src=valid_images[-1], cameraMatrix=camera, 
+                                   distCoeffs=distorsion_coefs, dst=None,
+                                   newCameraMatrix=ref_cam)
+        # Obtenemos por separado los valores de la cuaterna
+        # para trabajar más fácilmente.
+        print("refined camera = \n", ref_cam)
+        fx.show_img(correct_image, 'Resultado con lentes')    
