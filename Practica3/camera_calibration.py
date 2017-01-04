@@ -337,11 +337,13 @@ def epipolar_line_error(pts_im1, pts_im2, line_1, line_2):
     
     dst_pt1_to_line1 = []
     dst_pt2_to_line2 = []
-    
+    # Recorremos los puntos calculando las distancias 
+    # del punto a la línea
     for i in range(len(pts_im1)):
         dst_pt1_to_line1.append(dst(line_1[i], pts_im2[i]))
         dst_pt2_to_line2.append(dst(line_2[i], pts_im1[i]))
     
+    # Calculamos el error:
     F_error = (np.mean(dst_pt1_to_line1) + np.mean(dst_pt2_to_line2))/2
     print("Error de F: ", F_error)
     return F_error
