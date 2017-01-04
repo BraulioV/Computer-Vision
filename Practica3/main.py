@@ -18,11 +18,11 @@ if __name__ == '__main__':
 
     #cc.calibrate_camera_from(images,True)
     
-    
     vmort1 = cv2.imread('imagenes/Vmort1.pgm', flags=cv2.IMREAD_GRAYSCALE)
     vmort2 = cv2.imread('imagenes/Vmort2.pgm', flags=cv2.IMREAD_GRAYSCALE)
-
      
     fundamental_mat, img_points1, img_points2 = cc.estimate_fundamental_matrix_from(vmort1, vmort2)
     
-    cc.show_epilines(vmort1, img_points1, vmort2, img_points2, fundamental_mat)
+    epip1, epip2 = cc.show_epilines(vmort1, img_points1, vmort2, img_points2, fundamental_mat)
+    
+    cc.epipolar_line_error(img_points1, img_points2, epip1, epip2)

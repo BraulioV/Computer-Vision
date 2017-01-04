@@ -300,6 +300,7 @@ def show_epilines(image1, img_points1, image2, img_points2, fundamental_mat):
     epipolarline_img1 = cv2.computeCorrespondEpilines(img_points1, 1, fundamental_mat).reshape(-1,3)
     epipolarline_img2 = cv2.computeCorrespondEpilines(img_points2, 2, fundamental_mat).reshape(-1,3)
     # Dibujamos las líneas epipolares
+    # Lineas epipolares de la primera imagen sobre la segunda
     epip1, epip2 = draw_epilines(image1, img_points1, image2, img_points2, epipolarline_img1)
     canvas1 = np.zeros((epip1.shape[0],epip1.shape[1]+epip2.shape[1], 3), dtype = np.uint8)
     fx.insert_img_into_other(img_src=epip2, img_dest=canvas1,
@@ -308,6 +309,8 @@ def show_epilines(image1, img_points1, image2, img_points2, fundamental_mat):
     fx.insert_img_into_other(img_src=epip1, img_dest=canvas1,
                           pixel_left_top_row=0, pixel_left_top_col=epip1.shape[1],
                           substitute=True)
+    
+    # Lineas epipolares de la segunda imagen sobre la primera
     epip3, epip4 = draw_epilines(image2, img_points2, image1, img_points1, epipolarline_img2)
     canvas2 = np.zeros((epip3.shape[0],epip3.shape[1]+epip4.shape[1], 3), dtype = np.uint8)
     fx.insert_img_into_other(img_src=epip3, img_dest=canvas2,
@@ -316,7 +319,29 @@ def show_epilines(image1, img_points1, image2, img_points2, fundamental_mat):
     fx.insert_img_into_other(img_src=epip4, img_dest=canvas2,
                           pixel_left_top_row=0, pixel_left_top_col=epip1.shape[1],
                           substitute=True)
-      
+    # Mostramos ambas imágenes
     fx.show_img(canvas1, 'Todos los puntos en corresponencias')
     fx.show_img(canvas2, 'Todos los puntos en corresponencias')
     
+    return epipolarline_img1, epipolarline_img2
+    
+# Para calcular la bondad de F, usaremos el error
+# epipolar simétrico
+def epipolar_line_error(pts_im1, pts_im2, line_1, line_2):
+    
+    abs_value = math.fabs
+    sqrt = math.sqrt
+    # Función que calcula la distancia de un punto a una recta
+    dst = lambda line, point: abs_value((line[0]*point[0] + line[1]*point[1] 
+                                         + line[2])/sqrt(line[0]**2 + line[1]**2))
+    
+    dst_pt1_to_line1 = []
+    dst_pt2_to_line2 = []
+    
+    for i in range(len(pts_im1)):
+        dst_pt1_to_line1.append(dst(line_1[i], pts_im2[i]))
+        dst_pt2_to_line2.append(dst(line_2[i], pts_im1[i]))
+    
+    F_error = (np.mean(dst_pt1_to_line1) + np.mean(dst_pt2_to_line2))/2
+    print("Error de F: ", F_error)
+    return F_error
