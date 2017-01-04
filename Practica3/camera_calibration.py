@@ -186,8 +186,8 @@ def calibrate_camera_from(images, use_lenss = False, alpha = 1):
         fx.show_img(correct_image, 'Resultado con lentes')    
 
         
-def estimate_fundamental_matrix_from(image1, image2):
-    # Vamos a inicializar un dectector ORB 
+def get_matches(image1, image2):
+     # Vamos a inicializar un dectector ORB 
     # y un detector BRISK, y dejaremos aquel que obtenga
     # más puntos
     orb_detector = cv2.ORB_create()
@@ -211,24 +211,57 @@ def estimate_fundamental_matrix_from(image1, image2):
     # correspondencias y nos quedamos con sus matches
     if len(matches_orb) > len(matches_brisk):
         matches = matches_orb
+        kp1, kp2 = keyP1_orb, keyP2_orb
+        des1, des2 = des1_orb, des2_orb
         print("Puntos en corresponencia usando ORB")
+        print("Total de puntos: ", len(matches))
         img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_orb, 
                                     img2 = image2, keypoints2 = keyP2_orb, 
-                                    matches1to2 = matches, outImage=None, flags=2)
+                                    matches1to2 = matches, outImg = None, flags=2)
         sorted_kp_img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_orb, 
                                     img2 = image2, keypoints2 = keyP2_orb, 
                                     matches1to2 = sorted(matches, key = lambda x:x.distance)[0:int(len(matches)*0.15)], 
-                                    outImage=None, flags=2)
+                                    outImg = None, flags=2)
     else:
         matches = matches_brisk
+        kp1, kp2 = keyP1_brisk, keyP2_brisk
+        des1, des2 = des1_brisk, des2_brisk
         print("Puntos en corresponencia usando BRISK")
+        print("Total de puntos: ", len(matches))
         img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_brisk, 
                                     img2 = image2, keypoints2 = keyP2_brisk, 
-                                    matches1to2 = matches, outImage=None, flags=2)
+                                    matches1to2 = matches, outImg = None, flags=2)
         sorted_kp_img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_brisk, 
                                     img2 = image2, keypoints2 = keyP2_brisk, 
                                     matches1to2 = sorted(matches, key = lambda x:x.distance)[0:int(len(matches)*0.15)], 
-                                    outImage=None, flags=2)
+                                    outImg = None, flags=2)
     
     fx.show_img(img_match, 'Todos los puntos en corresponencias')    
-    fx.show_img(sorted_kp_img_match, 'Todos los puntos en corresponencias')    
+    fx.show_img(sorted_kp_img_match, 'El 15% de mejores puntos en corresponencias')  
+    
+    return matches, kp1, des1, kp2, des2
+        
+def estimate_fundamental_matrix_from(image1, image2):
+    # Obtenemos los puntos en correspondencias
+    matches, kp1, des1, kp2, des2 = get_matches(image1, image2)
+    img_points1 = []
+    img_points2 = []
+    # Recuperamos las coordenadas de los puntos en correspondencias:
+    for match in matches:
+        img_points1.append(kp1[match.queryIdx].pt)
+        img_points2.append(kp2[match.trainIdx].pt)
+        
+    img_points1 = np.array(img_points1, dtype=np.float32)
+    img_points2 = np.array(img_points2, dtype=np.float32)
+    # Psamos a obtener la matriz fundamental con el 
+    # algoritmo de los 8 puntos usando RANSAC
+    fundamental_mat, mask = cv2.findFundamentalMat(points1 = img_points1, 
+                                             points2 = img_points2,
+                                             method = cv2.FM_8POINT + cv2.FM_RANSAC, 
+                                             param2 = 0.9995)
+    print(fundamental_mat)
+    return fundamental_mat, img_points1, img_points2
+    
+
+def draw_epilines(image1, img_points1, image2, img_points2, fundamental_mat):
+    epiline_img1 = cv2.computeCorrespondEpilines(img_points1, 1, fundamental_mat)
