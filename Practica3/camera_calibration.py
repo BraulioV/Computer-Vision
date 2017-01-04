@@ -258,10 +258,65 @@ def estimate_fundamental_matrix_from(image1, image2):
     fundamental_mat, mask = cv2.findFundamentalMat(points1 = img_points1, 
                                              points2 = img_points2,
                                              method = cv2.FM_8POINT + cv2.FM_RANSAC, 
-                                             param2 = 0.9995)
+                                             param2 = 0.99995)
+    
+    # Descartamos los puntos que son outliers
+    img_points1 = img_points1[mask.ravel()==1]
+    img_points2 = img_points2[mask.ravel()==1]
     print(fundamental_mat)
+    
     return fundamental_mat, img_points1, img_points2
     
-
-def draw_epilines(image1, img_points1, image2, img_points2, fundamental_mat):
-    epiline_img1 = cv2.computeCorrespondEpilines(img_points1, 1, fundamental_mat)
+    
+def draw_epilines(image1, img_points1, image2, img_points2, epilines):
+    # Pasamos las imágenes de escala de grises a color para
+    # poder representar las líneas epipolares de una manera
+    # más clara
+    aux_img1 = cv2.cvtColor(image1, cv2.COLOR_GRAY2BGR)
+    aux_img2 = cv2.cvtColor(image2, cv2.COLOR_GRAY2BGR)
+    
+    for i in range(len(epilines)):
+        # Generamos un color aleatorio
+        line_color = tuple(np.random.randint(0,255,3).tolist())
+        init_point = (0, int(-epilines[i][2]/epilines[i][1]))
+        end_point = (image1.shape[1], int(-(epilines[i][2]+epilines[i][0]*image1.shape[1])/epilines[i][1]))
+        # al tener definidos los dos puntos, podemos 
+        # crear la línea epipolar que pasa por esos 
+        # dos puntos
+        aux_img1 = cv2.line(img = aux_img1, pt1 = init_point, 
+                            pt2 = end_point, color = line_color,
+                            thickness = 2)
+        aux_img1 = cv2.circle(img = aux_img1, 
+                              center=tuple(img_points1[i].astype(np.int64)), 
+                              radius = 3, color = line_color)
+        aux_img2 = cv2.circle(img = aux_img2, 
+                              center=tuple(img_points2[i].astype(np.int64)), 
+                              radius = 3, color = line_color)
+    
+    return aux_img1, aux_img2
+    
+def show_epilines(image1, img_points1, image2, img_points2, fundamental_mat):
+    # Obtenemos las epilineas de ambas imágenes
+    epipolarline_img1 = cv2.computeCorrespondEpilines(img_points1, 1, fundamental_mat).reshape(-1,3)
+    epipolarline_img2 = cv2.computeCorrespondEpilines(img_points2, 2, fundamental_mat).reshape(-1,3)
+    # Dibujamos las líneas epipolares
+    epip1, epip2 = draw_epilines(image1, img_points1, image2, img_points2, epipolarline_img1)
+    canvas1 = np.zeros((epip1.shape[0],epip1.shape[1]+epip2.shape[1], 3), dtype = np.uint8)
+    fx.insert_img_into_other(img_src=epip2, img_dest=canvas1,
+                          pixel_left_top_row=0, pixel_left_top_col=0,
+                          substitute=True)
+    fx.insert_img_into_other(img_src=epip1, img_dest=canvas1,
+                          pixel_left_top_row=0, pixel_left_top_col=epip1.shape[1],
+                          substitute=True)
+    epip3, epip4 = draw_epilines(image2, img_points2, image1, img_points1, epipolarline_img2)
+    canvas2 = np.zeros((epip3.shape[0],epip3.shape[1]+epip4.shape[1], 3), dtype = np.uint8)
+    fx.insert_img_into_other(img_src=epip3, img_dest=canvas2,
+                          pixel_left_top_row=0, pixel_left_top_col=0,
+                          substitute=True)
+    fx.insert_img_into_other(img_src=epip4, img_dest=canvas2,
+                          pixel_left_top_row=0, pixel_left_top_col=epip1.shape[1],
+                          substitute=True)
+      
+    fx.show_img(canvas1, 'Todos los puntos en corresponencias')
+    fx.show_img(canvas2, 'Todos los puntos en corresponencias')
+    
