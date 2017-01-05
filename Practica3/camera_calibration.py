@@ -186,7 +186,7 @@ def calibrate_camera_from(images, use_lenss = False, alpha = 1):
         fx.show_img(correct_image, 'Resultado con lentes')    
 
         
-def get_matches(image1, image2):
+def get_matches(image1, image2, show_imgs = True):
      # Vamos a inicializar un dectector ORB 
     # y un detector BRISK, y dejaremos aquel que obtenga
     # más puntos
@@ -215,27 +215,21 @@ def get_matches(image1, image2):
         des1, des2 = des1_orb, des2_orb
         print("Puntos en corresponencia usando ORB")
         print("Total de puntos: ", len(matches))
-        img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_orb, 
-                                    img2 = image2, keypoints2 = keyP2_orb, 
-                                    matches1to2 = matches, outImg = None, flags=2)
-        sorted_kp_img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_orb, 
-                                    img2 = image2, keypoints2 = keyP2_orb, 
-                                    matches1to2 = sorted(matches, key = lambda x:x.distance)[0:int(len(matches)*0.15)], 
-                                    outImg = None, flags=2)
+        
     else:
         matches = matches_brisk
         kp1, kp2 = keyP1_brisk, keyP2_brisk
         des1, des2 = des1_brisk, des2_brisk
         print("Puntos en corresponencia usando BRISK")
         print("Total de puntos: ", len(matches))
-        img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_brisk, 
-                                    img2 = image2, keypoints2 = keyP2_brisk, 
-                                    matches1to2 = matches, outImg = None, flags=2)
-        sorted_kp_img_match = cv2.drawMatches(img1 = image1, keypoints1 = keyP1_brisk, 
-                                    img2 = image2, keypoints2 = keyP2_brisk, 
-                                    matches1to2 = sorted(matches, key = lambda x:x.distance)[0:int(len(matches)*0.15)], 
-                                    outImg = None, flags=2)
-    
+    img_match = cv2.drawMatches(img1 = image1, keypoints1 = kp1,
+                                img2 = image2, keypoints2 = kp2, 
+                                matches1to2 = matches, outImg = None, flags=2)
+    sorted_kp_img_match = cv2.drawMatches(img1 = image1, keypoints1 = kp1, 
+                                          img2 = image2, keypoints2 = kp2, 
+                                          matches1to2 = sorted(matches, key = lambda x:x.distance)[0:int(len(matches)*0.15)], 
+                                          outImg = None, flags=2)
+
     fx.show_img(img_match, 'Todos los puntos en corresponencias')    
     fx.show_img(sorted_kp_img_match, 'El 15% de mejores puntos en corresponencias')  
     
@@ -348,3 +342,30 @@ def epipolar_line_error(pts_im1, pts_im2, line_1, line_2):
     F_error = (np.mean(dst_pt1_to_line1) + np.mean(dst_pt2_to_line2))/2
     print("Error de F: ", F_error)
     return F_error
+
+
+# Ejercicio 4
+
+def read_camera_file(name):
+    camera_matrix = []
+    radial_distorsion = []
+    rotation_matrix = []
+    translation_matrix = []
+    with open(name, 'r') as file:
+        for i in range(3):
+            camera_matrix.append(file.readline().split(sep = " ")[:3])
+            
+        radial_distorsion = file.readline().split(sep = " ")
+        
+        for i in range(3):
+            rotation_matrix.append(file.readline().split(sep = " ")[:3])
+            
+        translation_matrix = file.readline().split(sep = " ")
+        
+    # Pasamos las listas a arrays de NumPy
+    camera_matrix = np.array(camera_matrix, dtype=np.float32)
+    radial_distorsion = np.array(radial_distorsion, dtype=np.float32)
+    rotation_matrix = np.array(camera_matrix, dtype=np.float32)
+    translation_matrix = np.array(camera_matrix, dtype=np.float32)
+    
+    return camera_matrix, radial_distorsion, rotation_matrix, translation_matrix

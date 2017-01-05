@@ -18,11 +18,30 @@ if __name__ == '__main__':
 
     #cc.calibrate_camera_from(images,True)
     
-    vmort1 = cv2.imread('imagenes/Vmort1.pgm', flags=cv2.IMREAD_GRAYSCALE)
-    vmort2 = cv2.imread('imagenes/Vmort2.pgm', flags=cv2.IMREAD_GRAYSCALE)
+    #vmort1 = cv2.imread('imagenes/Vmort1.pgm', flags=cv2.IMREAD_GRAYSCALE)
+    #vmort2 = cv2.imread('imagenes/Vmort2.pgm', flags=cv2.IMREAD_GRAYSCALE)
      
-    fundamental_mat, img_points1, img_points2 = cc.estimate_fundamental_matrix_from(vmort1, vmort2)
+    #fundamental_mat, img_points1, img_points2 = cc.estimate_fundamental_matrix_from(vmort1, vmort2)
     
-    epip1, epip2 = cc.show_epilines(vmort1, img_points1, vmort2, img_points2, fundamental_mat)
+    #epip1, epip2 = cc.show_epilines(vmort1, img_points1, vmort2, img_points2, fundamental_mat)
     
-    cc.epipolar_line_error(img_points1, img_points2, epip1, epip2)
+    #cc.epipolar_line_error(img_points1, img_points2, epip1, epip2)
+    
+    # Archivos de las cámaras
+    camera_file_names = ['imagenes/rdimage.000.ppm.camera',
+                         'imagenes/rdimage.001.ppm.camera',
+                         'imagenes/rdimage.004.ppm.camera',
+                        ]
+    
+    camera_matrix00, radial_distorsion00, rotation_matrix00, translation_matrix00 = \
+        cc.read_camera_file(camera_file_names[0])
+    camera_matrix01, radial_distorsion01, rotation_matrix01, translation_matrix01 = \
+        cc.read_camera_file(camera_file_names[1])
+    camera_matrix04, radial_distorsion04, rotation_matrix04, translation_matrix04 = \
+        cc.read_camera_file(camera_file_names[2])
+        
+    # Imágenes    
+    rdimages = [cv2.imread('imagenes/rdimage.000.ppm', flags=cv2.IMREAD_COLOR), 
+                cv2.imread('imagenes/rdimage.001.ppm', flags=cv2.IMREAD_COLOR), 
+                cv2.imread('imagenes/rdimage.004.ppm', flags=cv2.IMREAD_COLOR),
+               ]
