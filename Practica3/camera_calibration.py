@@ -251,19 +251,20 @@ def estimate_fundamental_matrix_from(image1, image2):
         img_points1.append(kp1[match.queryIdx].pt)
         img_points2.append(kp2[match.trainIdx].pt)
         
-    img_points1 = np.array(img_points1, dtype=np.float32)
-    img_points2 = np.array(img_points2, dtype=np.float32)
+    img_points1 = np.array(img_points1, dtype=np.int32)
+    img_points2 = np.array(img_points2, dtype=np.int32)
     # Psamos a obtener la matriz fundamental con el 
     # algoritmo de los 8 puntos usando RANSAC
     fundamental_mat, mask = cv2.findFundamentalMat(points1 = img_points1, 
                                              points2 = img_points2,
                                              method = cv2.FM_8POINT + cv2.FM_RANSAC, 
-                                             param2 = 0.99995)
+                                             param1 = 10**-2,
+                                             param2 = 0.9999999)
     
     # Descartamos los puntos que son outliers
     img_points1 = img_points1[mask.ravel()==1]
     img_points2 = img_points2[mask.ravel()==1]
-    print(fundamental_mat)
+    print("Matriz fundamental F:\n",fundamental_mat)
     
     return fundamental_mat, img_points1, img_points2
     
@@ -301,7 +302,7 @@ def show_epilines(image1, img_points1, image2, img_points2, fundamental_mat):
     epipolarline_img2 = cv2.computeCorrespondEpilines(img_points2, 2, fundamental_mat).reshape(-1,3)
     # Dibujamos las líneas epipolares
     # Lineas epipolares de la primera imagen sobre la segunda
-    epip1, epip2 = draw_epilines(image1, img_points1, image2, img_points2, epipolarline_img1)
+    epip1, epip2 = draw_epilines(image1, img_points1, image2, img_points2, epipolarline_img2)
     canvas1 = np.zeros((epip1.shape[0],epip1.shape[1]+epip2.shape[1], 3), dtype = np.uint8)
     fx.insert_img_into_other(img_src=epip2, img_dest=canvas1,
                           pixel_left_top_row=0, pixel_left_top_col=0,
@@ -311,7 +312,7 @@ def show_epilines(image1, img_points1, image2, img_points2, fundamental_mat):
                           substitute=True)
     
     # Lineas epipolares de la segunda imagen sobre la primera
-    epip3, epip4 = draw_epilines(image2, img_points2, image1, img_points1, epipolarline_img2)
+    epip3, epip4 = draw_epilines(image2, img_points2, image1, img_points1, epipolarline_img1)
     canvas2 = np.zeros((epip3.shape[0],epip3.shape[1]+epip4.shape[1], 3), dtype = np.uint8)
     fx.insert_img_into_other(img_src=epip3, img_dest=canvas2,
                           pixel_left_top_row=0, pixel_left_top_col=0,
