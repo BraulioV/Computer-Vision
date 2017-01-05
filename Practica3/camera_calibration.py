@@ -187,7 +187,7 @@ def calibrate_camera_from(images, use_lenss = False, alpha = 1):
 
         
 def get_matches(image1, image2, show_imgs = True):
-     # Vamos a inicializar un dectector ORB 
+    # Vamos a inicializar un dectector ORB 
     # y un detector BRISK, y dejaremos aquel que obtenga
     # más puntos
     orb_detector = cv2.ORB_create()
@@ -222,16 +222,18 @@ def get_matches(image1, image2, show_imgs = True):
         des1, des2 = des1_brisk, des2_brisk
         print("Puntos en corresponencia usando BRISK")
         print("Total de puntos: ", len(matches))
-    img_match = cv2.drawMatches(img1 = image1, keypoints1 = kp1,
-                                img2 = image2, keypoints2 = kp2, 
-                                matches1to2 = matches, outImg = None, flags=2)
-    sorted_kp_img_match = cv2.drawMatches(img1 = image1, keypoints1 = kp1, 
-                                          img2 = image2, keypoints2 = kp2, 
-                                          matches1to2 = sorted(matches, key = lambda x:x.distance)[0:int(len(matches)*0.15)], 
-                                          outImg = None, flags=2)
+    
+    if show_images:
+        img_match = cv2.drawMatches(img1 = image1, keypoints1 = kp1,
+                                    img2 = image2, keypoints2 = kp2, 
+                                    matches1to2 = matches, outImg = None, flags=2)
+        sorted_kp_img_match = cv2.drawMatches(img1 = image1, keypoints1 = kp1, 
+                                              img2 = image2, keypoints2 = kp2, 
+                                              matches1to2 = sorted(matches, key = lambda x:x.distance)[0:int(len(matches)*0.15)], 
+                                              outImg = None, flags=2)
 
-    fx.show_img(img_match, 'Todos los puntos en corresponencias')    
-    fx.show_img(sorted_kp_img_match, 'El 15% de mejores puntos en corresponencias')  
+        fx.show_img(img_match, 'Todos los puntos en corresponencias')    
+        fx.show_img(sorted_kp_img_match, 'El 15% de mejores puntos en corresponencias')  
     
     return matches, kp1, des1, kp2, des2
         
@@ -315,8 +317,8 @@ def show_epilines(image1, img_points1, image2, img_points2, fundamental_mat):
                           pixel_left_top_row=0, pixel_left_top_col=epip1.shape[1],
                           substitute=True)
     # Mostramos ambas imágenes
-    fx.show_img(canvas1, 'Todos los puntos en corresponencias')
-    fx.show_img(canvas2, 'Todos los puntos en corresponencias')
+    fx.show_img(canvas1, 'Epilineas')
+    fx.show_img(canvas2, 'Epilineas')
     
     return epipolarline_img1, epipolarline_img2
     
@@ -351,15 +353,20 @@ def read_camera_file(name):
     radial_distorsion = []
     rotation_matrix = []
     translation_matrix = []
+    # Leemos el fichero para cargar los datos
     with open(name, 'r') as file:
+        # Cargamos la matriz cámara
         for i in range(3):
             camera_matrix.append(file.readline().split(sep = " ")[:3])
-            
+        
+        # Cargamos la distorsión radial
         radial_distorsion = file.readline().split(sep = " ")
         
+        # Cargamos la matriz de rotación
         for i in range(3):
             rotation_matrix.append(file.readline().split(sep = " ")[:3])
-            
+        
+        # Cargamos la matriz translación
         translation_matrix = file.readline().split(sep = " ")
         
     # Pasamos las listas a arrays de NumPy
@@ -369,3 +376,40 @@ def read_camera_file(name):
     translation_matrix = np.array(camera_matrix, dtype=np.float32)
     
     return camera_matrix, radial_distorsion, rotation_matrix, translation_matrix
+
+def get_matches_of_3(image1, image2, image3, show = False):
+    # Inicializamos el detector BRISK
+    brisk_detector = cv2.BRISK_create()
+    # Obtenemos los keypoints y sus descriptores
+    kp1, des1 = brisk_detector.detectAndCompute(image1,None)
+    kp2, des2 = brisk_detector.detectAndCompute(image2,None)
+    kp3, des3 = brisk_detector.detectAndCompute(image3,None)
+    # Inicializamos el matcher
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+    # Obtenemos los puntos en corresponencia entre
+    # cada par de imágenes
+    matches1to2 = bf.match(des1, des2)
+    matches1to3 = bf.match(des1, des3)
+    matches2to3 = bf.match(des2, des3)
+    # Si el flag show está activo se 
+    # muestran las imágenes por pantalla con 
+    # algunos de los mejores matches
+    
+    if show:
+        some_matches_1to2 = cv2.drawMatches(img1 = image1, keypoints1 = kp1, 
+                                            img2 = image2, keypoints2 = kp2, 
+                                            matches1to2 = sorted(matches1to2, key = lambda x:x.distance)[0:int(len(matches1to2)*0.15)], 
+                                            outImg = None, flags=2)
+        some_matches_1to3 = cv2.drawMatches(img1 = image1, keypoints1 = kp1, 
+                                            img2 = image3, keypoints2 = kp3, 
+                                            matches1to2 = sorted(matches1to3, key = lambda x:x.distance)[0:int(len(matches1to3)*0.15)], 
+                                            outImg = None, flags=2)
+        some_matches_2to3 = cv2.drawMatches(img1 = image2, keypoints1 = kp2, 
+                                            img2 = image3, keypoints2 = kp3, 
+                                            matches1to2 = sorted(matches2to3, key = lambda x:x.distance)[0:int(len(matches2to3)*0.15)], 
+                                            outImg = None, flags=2)
+        fx.show_img(some_matches_1to2, 'El 15% de mejores puntos en corresponencias')  
+        fx.show_img(some_matches_1to3, 'El 15% de mejores puntos en corresponencias')  
+        fx.show_img(some_matches_2to3, 'El 15% de mejores puntos en corresponencias')  
+
+    return kp1, des1, kp2, des2, kp3, des3, matches1to2, matches1to3, matches2to3

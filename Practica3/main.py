@@ -41,7 +41,10 @@ if __name__ == '__main__':
         cc.read_camera_file(camera_file_names[2])
         
     # Imágenes    
-    rdimages = [cv2.imread('imagenes/rdimage.000.ppm', flags=cv2.IMREAD_COLOR), 
-                cv2.imread('imagenes/rdimage.001.ppm', flags=cv2.IMREAD_COLOR), 
-                cv2.imread('imagenes/rdimage.004.ppm', flags=cv2.IMREAD_COLOR),
-               ]
+    rdimages000 = cv2.imread('imagenes/rdimage.000.ppm', flags=cv2.IMREAD_COLOR) 
+    rdimages001 = cv2.imread('imagenes/rdimage.001.ppm', flags=cv2.IMREAD_COLOR)
+    rdimages004 = cv2.imread('imagenes/rdimage.004.ppm', flags=cv2.IMREAD_COLOR)
+    
+    cc.get_matches_of_3(rdimages000, rdimages001, rdimages004)
+    
+    
