@@ -45,6 +45,10 @@ if __name__ == '__main__':
     rdimages001 = cv2.imread('imagenes/rdimage.001.ppm', flags=cv2.IMREAD_COLOR)
     rdimages004 = cv2.imread('imagenes/rdimage.004.ppm', flags=cv2.IMREAD_COLOR)
     
-    cc.get_matches_of_3(rdimages000, rdimages001, rdimages004)
+    kp1, des1, kp2, des2, kp3, des3, matches1to2, matches1to3, matches2to3 = \
+        cc.get_matches_of_3(rdimages000, rdimages001, rdimages004)
     
+    E_1to2 = cc.calculate_essential_matrix(matches1to2, camera_matrix00, camera_matrix01,
+                                          kp1, kp2)
     
+    cc.calculate_rotation(E_1to2, camera_matrix01)

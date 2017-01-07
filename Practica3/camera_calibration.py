@@ -24,7 +24,7 @@ def generate_Pcamera():
     while not np.linalg.det(P_cam[0:3,0:3]):
         P_cam = np.random.rand(3,4)
 
-    P_cam = P_cam / P_cam[-1,-1]
+    P_cam = P_cam / P_cam[-1,-2]
     return P_cam
 
 
@@ -101,11 +101,11 @@ def DLT_algorithm(real_points, projected_points, camera):
     # Descomponemos la matriz
     U, s, V = np.linalg.svd(np.array(aux, dtype=np.float64))
     # Obtenemos los parámetros
-    camera_estimated = V[-1,:]/V[-1,-1]
+    camera_estimated = V[-1,:]/V[-1,-2]
     camera_estimated = np.matrix(camera_estimated).reshape(3,4)
     # Desnormalizamos
     camera_estimated = np.dot(np.dot(np.linalg.pinv(N_matrix2d), camera_estimated), N_matrix)
-    camera_estimated = camera_estimated/camera_estimated[-1,-1]
+    camera_estimated = camera_estimated/camera_estimated[-1,-2]
     # Calculamos el error de la cámara estimada
     error = np.linalg.norm(x=(camera - camera_estimated), ord=None)
     
@@ -347,7 +347,6 @@ def epipolar_line_error(pts_im1, pts_im2, line_1, line_2):
 
 
 # Ejercicio 4
-
 def read_camera_file(name):
     camera_matrix = []
     radial_distorsion = []
@@ -408,8 +407,64 @@ def get_matches_of_3(image1, image2, image3, show = False):
                                             img2 = image3, keypoints2 = kp3, 
                                             matches1to2 = sorted(matches2to3, key = lambda x:x.distance)[0:int(len(matches2to3)*0.15)], 
                                             outImg = None, flags=2)
+        
         fx.show_img(some_matches_1to2, 'El 15% de mejores puntos en corresponencias')  
         fx.show_img(some_matches_1to3, 'El 15% de mejores puntos en corresponencias')  
         fx.show_img(some_matches_2to3, 'El 15% de mejores puntos en corresponencias')  
 
     return kp1, des1, kp2, des2, kp3, des3, matches1to2, matches1to3, matches2to3
+
+
+def calculate_essential_matrix(matches, camera_img1, camera_img2, kp1, kp2):
+    
+    img_points1, img_points2 = [], []
+    
+    for match in matches:
+        img_points1.append(kp1[match.queryIdx].pt)
+        img_points2.append(kp2[match.trainIdx].pt)
+        
+    img_points1 = np.array(img_points1, dtype=np.int32)
+    img_points2 = np.array(img_points2, dtype=np.int32)
+        
+    fundamental_mat, mask = cv2.findFundamentalMat(points1 = img_points1, 
+                                             points2 = img_points2,
+                                             method = cv2.FM_8POINT + cv2.FM_RANSAC, 
+                                             param1 = 10**-2,
+                                             param2 = 0.9999999)
+    
+    # La matriz esencial E, se calcula como:
+    #         E = K_2^T * F * K_1
+    # donde K_2 es la cámara de la segunda imagen,
+    # K_1 es la cámara de la primera imagen y F
+    # la matriz fundamental
+    return camera_img2.astype(np.float64).T.dot(fundamental_mat.astype(np.float64)).dot(camera_img1.astype(np.float64))
+    
+
+def calculate_rotation(essential_matrix, camera):
+    E = essential_matrix
+    
+    print("E: \n", E)
+    
+    W = np.array([0, -1, 0, 1,  0, 0, 0,  0, 1 ], dtype = np.float64).reshape(3,3)
+    
+    print("\n\nW:", W)
+    
+    U,D,V = np.linalg.svd(np.array(E, dtype=np.float64))
+    # Calculamos las dos posibles formas que puede tener 
+    # la matriz de rotación a partir de la descomposición 
+    # en valores singulares de la matriz esencial
+    #    * R = U·W·V^T
+    R_uwvt = U.dot(W).dot(V.T)
+    #    * R = U·W^T·V^T
+    R_uwtvt = U.dot(W.T).dot(V.T)
+    # La matriz "t" la podemos obtener a partir de la última
+    # columna de U, pero el signo es desconocido, por lo que 
+    # aparecen cuatro soluciones posibles en función del valor
+    # de R y el signo de t
+    P_uwvt = camera.dot(np.hstack(R_uwvt, U[:,-1]))
+    P_neg_uwvt = camera.dot(np.hstack(R_uwvt, -U[:,-1]))
+    P_uwtvt = camera.dot(np.hstack(R_uwtvt, U[:,-1]))
+    P_neg_uwtvt = camera.dot(np.hstack(R_uwtvt, -U[:,-1]))
+    
+    return P_uwvt, P_neg_uwvt, P_uwtvt, P_neg_uwtvt
+
