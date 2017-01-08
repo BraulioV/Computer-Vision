@@ -112,6 +112,11 @@ def DLT_algorithm(real_points, projected_points, camera):
     return camera_estimated, error
 
 
+############################################################
+#                       Ejercicio 2
+#    Calibración de la cámara a partir de homografías
+############################################################
+
 def calibrate_camera_from(images, use_lenss = False, alpha = 1):
     valids = []
     size = (13, 12)
@@ -184,7 +189,12 @@ def calibrate_camera_from(images, use_lenss = False, alpha = 1):
         # Obtenemos por separado los valores de la cuaterna
         # para trabajar más fácilmente.
         fx.show_img(correct_image, 'Resultado con lentes')    
+        
 
+############################################################
+#                       Ejercicio 3
+#          Estimación de la matriz fundamental F
+############################################################
         
 def get_matches(image1, image2, show_imgs = True):
     # Vamos a inicializar un dectector ORB 
