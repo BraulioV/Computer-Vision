@@ -335,7 +335,6 @@ def show_epilines(image1, img_points1, image2, img_points2, fundamental_mat):
 # Para calcular la bondad de F, usaremos el error
 # epipolar simétrico
 def epipolar_line_error(pts_im1, pts_im2, line_1, line_2):
-    
     abs_value = math.fabs
     sqrt = math.sqrt
     # Función que calcula la distancia de un punto a una recta
