@@ -139,7 +139,7 @@ def calibrate_camera_from(images, use_lenss = False, alpha = 1):
         # Si es un punto válido:
         if valids[i][0]:
             # Mostramos el patrón de puntos encontrado
-            fx.show_img(cv2.drawChessboardCorners(image = images[i], 
+            fx.show_img(cv2.drawChessboardCorners(image = cv2.cvtColor(images[i], cv2.COLOR_GRAY2BGR), 
                                                   patternSize = size,
                                                   corners = valids[i][1], 
                                                   patternWasFound = valids[i][0]),
@@ -175,6 +175,7 @@ def calibrate_camera_from(images, use_lenss = False, alpha = 1):
         ref_cam, valid_rectangle = cv2.getOptimalNewCameraMatrix(camera, distorsion_coefs, 
                                                                  (width, height), alpha, 
                                                                  (width, height))
+        print("refined camera = \n", ref_cam)
         # Una vez que hemos obtenido la cámara refinada
         # pasamos a rectificar la distorsión.
         correct_image = cv2.undistort(src=valid_images[-1], cameraMatrix=camera, 
@@ -182,7 +183,6 @@ def calibrate_camera_from(images, use_lenss = False, alpha = 1):
                                    newCameraMatrix=ref_cam)
         # Obtenemos por separado los valores de la cuaterna
         # para trabajar más fácilmente.
-        print("refined camera = \n", ref_cam)
         fx.show_img(correct_image, 'Resultado con lentes')    
 
         
@@ -272,7 +272,7 @@ def draw_epilines(image1, img_points1, image2, img_points2, epilines):
     aux_img1 = cv2.cvtColor(image1, cv2.COLOR_GRAY2BGR)
     aux_img2 = cv2.cvtColor(image2, cv2.COLOR_GRAY2BGR)
     
-    for i in range(len(epilines)):
+    for i in range(min(len(epilines),200)):
         # Generamos un color aleatorio
         line_color = tuple(np.random.randint(0,255,3).tolist())
         init_point = (0, int(-epilines[i][2]/epilines[i][1]))
