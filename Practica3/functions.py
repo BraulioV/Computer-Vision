@@ -1,19 +1,6 @@
 import math
 import cv2
 import numpy as np
-#from matplotlib import pyplot as plt
-
-def show_img_on_jupyter(im):
-    if len(im.shape) == 3:
-        img = cv2.cvtColor(im.astype(np.uint8), cv2.COLOR_BGR2RGB)
-        plt.imshow(img)
-    else:
-        img = im
-        plt.imshow(img, cmap='Greys_r')
-    
-    plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
-    plt.show()
-
 
 ###############################################################################
 #   EJERCICIO 1
