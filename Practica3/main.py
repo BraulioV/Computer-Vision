@@ -18,14 +18,14 @@ if __name__ == '__main__':
 
     #cc.calibrate_camera_from(images,True)
     
-    #vmort1 = cv2.imread('imagenes/Vmort1.pgm', flags=cv2.IMREAD_GRAYSCALE)
-    #vmort2 = cv2.imread('imagenes/Vmort2.pgm', flags=cv2.IMREAD_GRAYSCALE)
+    vmort1 = cv2.imread('imagenes/Vmort1.pgm', flags=cv2.IMREAD_GRAYSCALE)
+    vmort2 = cv2.imread('imagenes/Vmort2.pgm', flags=cv2.IMREAD_GRAYSCALE)
      
-    #fundamental_mat, img_points1, img_points2 = cc.estimate_fundamental_matrix_from(vmort1, vmort2)
+    fundamental_mat, img_points1, img_points2 = cc.estimate_fundamental_matrix_from(vmort1, vmort2)
     
-    #epip1, epip2 = cc.show_epilines(vmort1, img_points1, vmort2, img_points2, fundamental_mat)
+    epip1, epip2 = cc.show_epilines(vmort1, img_points1, vmort2, img_points2, fundamental_mat)
     
-    #cc.epipolar_line_error(img_points1, img_points2, epip1, epip2)
+    cc.epipolar_line_error(img_points1, img_points2, epip1, epip2)
     
     # Archivos de las cámaras
     camera_file_names = ['imagenes/rdimage.000.ppm.camera',
@@ -46,9 +46,9 @@ if __name__ == '__main__':
     rdimages004 = cv2.imread('imagenes/rdimage.004.ppm', flags=cv2.IMREAD_COLOR)
     
     kp1, des1, kp2, des2, kp3, des3, matches1to2, matches1to3, matches2to3 = \
-        cc.get_matches_of_3(rdimages000, rdimages001, rdimages004)
+    cc.get_matches_of_3(rdimages000, rdimages001, rdimages004)
     
-    E_1to2 = cc.calculate_essential_matrix(matches1to2, camera_matrix00, camera_matrix01,
-                                          kp1, kp2)
+    E_1to2 = cc.calculate_essential_matrix(matches1to2, camera_matrix00, 
+                                           camera_matrix01, kp1, kp2)
     
     cc.calculate_rotation(E_1to2, camera_matrix01)

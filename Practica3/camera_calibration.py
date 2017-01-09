@@ -183,12 +183,12 @@ def calibrate_camera_from(images, use_lenss = False, alpha = 1):
         print("refined camera = \n", ref_cam)
         # Una vez que hemos obtenido la cámara refinada
         # pasamos a rectificar la distorsión.
-        correct_image = cv2.undistort(src=valid_images[-1], cameraMatrix=camera, 
-                                   distCoeffs=distorsion_coefs, dst=None,
-                                   newCameraMatrix=ref_cam)
-        # Obtenemos por separado los valores de la cuaterna
-        # para trabajar más fácilmente.
-        fx.show_img(correct_image, 'Resultado con lentes')    
+        for img in valid_images:
+            correct_image = cv2.undistort(src=img, cameraMatrix=camera, 
+                                       distCoeffs=distorsion_coefs, dst=None,
+                                       newCameraMatrix=ref_cam)
+            # Mostramos las imágenes con la distorsión corregida
+            fx.show_img(correct_image, 'Resultado con lentes')    
         
 
 ############################################################
@@ -233,7 +233,7 @@ def get_matches(image1, image2, show_imgs = True):
         print("Puntos en corresponencia usando BRISK")
         print("Total de puntos: ", len(matches))
     
-    if show_images:
+    if show_imgs:
         img_match = cv2.drawMatches(img1 = image1, keypoints1 = kp1,
                                     img2 = image2, keypoints2 = kp2, 
                                     matches1to2 = matches, outImg = None, flags=2)
@@ -265,7 +265,7 @@ def estimate_fundamental_matrix_from(image1, image2):
                                              points2 = img_points2,
                                              method = cv2.FM_8POINT + cv2.FM_RANSAC, 
                                              param1 = 10**-2,
-                                             param2 = 0.9999999)
+                                             param2 = 10**-5)
     
     # Descartamos los puntos que son outliers
     img_points1 = img_points1[mask.ravel()==1]
@@ -470,10 +470,16 @@ def calculate_rotation(essential_matrix, camera):
     # columna de U, pero el signo es desconocido, por lo que 
     # aparecen cuatro soluciones posibles en función del valor
     # de R y el signo de t
-    P_uwvt = camera.dot(np.hstack(R_uwvt, U[:,-1]))
-    P_neg_uwvt = camera.dot(np.hstack(R_uwvt, -U[:,-1]))
-    P_uwtvt = camera.dot(np.hstack(R_uwtvt, U[:,-1]))
-    P_neg_uwtvt = camera.dot(np.hstack(R_uwtvt, -U[:,-1]))
+    T = U[:,-1].reshape(1,3).T
+    P_uwvt = camera.dot(np.hstack((R_uwvt, T)))
+    P_neg_uwvt = camera.dot(np.hstack((R_uwvt, -T)))
+    P_uwtvt = camera.dot(np.hstack((R_uwtvt, T)))
+    P_neg_uwtvt = camera.dot(np.hstack((R_uwtvt, -T)))
+    print("\nCámaras estimadas:")
+    print("P = UWV^T:\n", P_uwvt, "\n")
+    print("P = -UWV^T:\n", P_neg_uwvt, "\n")
+    print("P = UW^TV^T:\n", P_uwtvt, "\n")
+    print("P = -UW^TV^T:\n", P_neg_uwtvt, "\n")
     
     return P_uwvt, P_neg_uwvt, P_uwtvt, P_neg_uwtvt
 
