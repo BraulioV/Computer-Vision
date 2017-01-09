@@ -449,7 +449,7 @@ def calculate_essential_matrix(matches, camera_img1, camera_img2, kp1, kp2):
     return camera_img2.astype(np.float64).T.dot(fundamental_mat.astype(np.float64)).dot(camera_img1.astype(np.float64))
     
 
-def calculate_rotation(essential_matrix, camera):
+def calculate_possible_solutions(essential_matrix, camera):
     E = essential_matrix
     
     print("E: \n", E)

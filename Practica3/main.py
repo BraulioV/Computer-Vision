@@ -51,4 +51,4 @@ if __name__ == '__main__':
     E_1to2 = cc.calculate_essential_matrix(matches1to2, camera_matrix00, 
                                            camera_matrix01, kp1, kp2)
     
-    cc.calculate_rotation(E_1to2, camera_matrix01)
+    cc.calculate_possible_solutions(E_1to2, camera_matrix01)
