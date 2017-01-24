@@ -24,3 +24,8 @@ This repo contains three differents Jupyter Notebooks, divided on different sect
 * __Camera calibration__: camera calibration using chessboard images and the OpenCV functions ```findChessboardCorners```, ```drawChessboardCorners``` to visualize the pattern and ```calibrateCamera``` to calibrate the camera. To correct the lens distortion I use ```getOptimalNewCameraMatrix``` and ```undistort```.
 * __Fundamental matrix estimation__: ![equation](http://mathurl.com/jnymkmc.png) estimation using BRISK/ORB detector to get points corresponences and 8-point algorithm with RANSAC. Also we can see the epilines on the images.
 * __Essential matrix estimation, translation and rotation between two images__: essential matrix estimation using points correspondences, and the 4 possible solutions to [R|T] matrix problem.
+
+#### Requirements
+* Python 3.
+* NumPy.
+* OpenCV.
