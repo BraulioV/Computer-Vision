@@ -8,8 +8,8 @@ This repo contains three differents Jupyter Notebooks, divided on different sect
 
 ### Filtering and subsetting
 
-* __Gaussian filters__: one of the exercises consists on create a gaussian filter to create a mask and convolves the images with this maks.
-* __Hybrid images__: the hybrid images are two differente images mixed on a new image that contain the low frecuencies of one of the images, and the high frecuencies of the other image, to create the "ilussion" that if you look the image closer, it looks like the image where we take the high freccuencies, and if we look at smaller scale, the image of the low frecuencies appear.
+* __Gaussian filters__: one of the exercises consists on create a gaussian filter to create a mask and convolves the images with this masks.
+* __Hybrid images__: the hybrid images are two differents images mixed on a new image that contain the low frequencies of one of the images, and the high frequencies of the other image, to create the "illusion" that if you look the image closer, you can see the image where we take the high frequencies, and if you look further, the image of the low frequencies appear.
 * __Gaussian Pyramid__: to make it easier to appreciate the effect of the hybrid images, you can create a gaussian pyramid where it appears the same image at different scales.
 
 ### Keypoints, descriptors, homographies and panoramas
